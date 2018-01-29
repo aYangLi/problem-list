@@ -1,5 +1,16 @@
 ### 目录
+[2.jQuery 中 trigger 的使用](#2)  
 [1.stick footer 黏性底部](#1)
+
+<h3 id='2'>2.jQuery 中 trigger 的使用</h3> 
+
+#### 详情描述
+
+1. trigger不可以直接触发input（file）、select的原生事件；可以触发给元素添加的事件；但是如果trigger外面包了一层on（“click”），则可以触发input（file）、select的原生事件
+
+2. trigger触发某个元素的某个事件，首先得让那个元素把那个事件添加的函数提前执行；比如可以使用 trigger 做进入页面自动定位的功能，但是在触发 trigger 之前，必须确保触发元素的事件已经绑定上；
+
+3. fastclick.js会影响trigger的使用，出现点击第一次没有出现响应，第二次才起效果（具体原因请看移动端 300ms 延时问题）
 
 <h3 id='1'>1.stick footer 黏性底部</h3>  
 
