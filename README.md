@@ -1,7 +1,7 @@
 ### 目录
-[1.stickfooter黏性底部](#1)
+[1.stick footer 黏性底部](#1)
 
-<h3 id='1'>1.stickfooter黏性底部</h3>  
+<h3 id='1'>1.stick footer 黏性底部</h3>  
 
 #### 问题描述  
 
