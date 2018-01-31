@@ -1,4 +1,5 @@
 ### 目录
+[18. 移动端 border 宽度问题](#18)  
 [17. flex布局中的注意事项](#17)  
 [16. jQuery选取元素](#16)  
 [15. 布局垂直对齐的方式](#15)  
@@ -16,6 +17,12 @@
 [3. 给元素添加事件满足的条件](#3)  
 [2. jQuery 中 trigger 的使用](#2)  
 [1. stick footer 黏性底部](#1)
+
+<h3 id='18'>18. 移动端 border 宽度问题</h3>
+
+#### 详情描述
+
+在移动端布局中，经常使用 rem 单位，但是 border 使用热门单位时会有兼容性， 比如魅族手机浏览器，ios 部分系统；border 不显示；可以使用 px 布局；
 
 <h3 id='17'>17. flex布局中的注意事项</h3>
 
@@ -36,7 +43,7 @@ $("p","div")	找到div里面的p
 
 #### 详情描述
 1. 左右容器分别设置display:table-cell；vertical-align:middle;
-2. 左右容器分别设置display:inline-block；vertical-align:middle;
+2. 左右容器分别设置display:inline-block；vertical-align:middle;（会出先兼容问题，比如努比亚z11line-height不起效果；可以利用padding居中，把空白撑开）
 
 **注意：** display:table-cell属性指让标签元素以表格单元格的形式呈现，可以实现元素的垂直居中对齐(vertical-align:middle;)，关联伸缩等，与其他一些display属性类似，table-cell同样会被其他一些CSS属性破坏，例如float, position:absolute
 
