@@ -1,4 +1,5 @@
 ### 目录
+[15.布局垂直对其的方式](#15)  
 [14.cookie 和 session 的区别](#14)  
 [13.自动登录的实现](#13)  
 [12.移动端的几种适配](#12)  
@@ -13,6 +14,14 @@
 [3.给元素添加事件满足的条件](#3)  
 [2.jQuery 中 trigger 的使用](#2)  
 [1.stick footer 黏性底部](#1)
+
+<h3 id='15'>15.布局垂直对其的方式</h3>
+
+#### 详情描述
+1. 左右容器分别设置display:table-cell；vertical-align:middle;
+2. 左右容器分别设置display:inline-block；vertical-align:middle;
+
+**注意：** display:table-cell属性指让标签元素以表格单元格的形式呈现，可以实现元素的垂直居中对齐(vertical-align:middle;)，关联伸缩等，与其他一些display属性类似，table-cell同样会被其他一些CSS属性破坏，例如float, position:absolute
 
 <h3 id='14'>14.cookie 和 session 的区别</h3>
 
