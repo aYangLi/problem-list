@@ -1,4 +1,5 @@
 ### 目录
+[11.jQuery中判断一个元素是否显示或者隐藏](#11)  
 [10.ios中的一些兼容问题](#10)  
 [9.require.js 做单页面应用](#9)  
 [8.分享qq空间出现失败](#8)  
@@ -9,6 +10,31 @@
 [3.给元素添加事件满足的条件](#3)  
 [2.jQuery 中 trigger 的使用](#2)  
 [1.stick footer 黏性底部](#1)
+
+<h3 id='11'>11.jQuery中判断一个元素是否显示或者隐藏</h3>
+
+#### 详情描述
+1. 第一种方式：
+
+```
+
+alert($('.div1').is(':hidden'));//false,没隐藏
+alert($('.div2').is(':hidden'));//true,隐藏了
+$('#dvData').is(":visible")
+```
+2. 第二种方式：
+
+```
+if ($('#dvData').css('display') == 'none') {
+    // Item is hidden. Write your code.
+}
+if($('#dvData').is(":visible")){
+     // Item is hidden. Write your code.
+}
+if ($('#dvData').css("visibility") == "hidden"){
+   // Item is hidden. Write your code.
+}
+```
 
 <h3 id='10'>10.ios中的一些兼容问题</h3>
 
