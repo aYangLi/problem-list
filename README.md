@@ -1,4 +1,5 @@
 ### 目录
+[21. 跨域的方式](#21)  
 [20. select 默认选中问题](#20)  
 [19. 兼容脚本](#19)  
 [18. 移动端 border 宽度问题](#18)  
@@ -20,6 +21,18 @@
 [2. jQuery 中 trigger 的使用](#2)  
 [1. stick footer 黏性底部](#1)
 
+<h3 id='21'>21. 跨域的方式</h3>
+
+#### 详情描述
+
+具体详情见微信朋友圈
+1. jsonp，动态创建script标签，scr设置为需要跨域的域名，加callback回掉函数参数。但是支持get请求，且必须后台支持jsonp跨域；
+2. document.domain	设置相同的doncument.domain，动态创建一个隐藏的iframe来跨域；
+3. window.name 这个全局属性主要是用来获取和这只窗口名称，但是通过结合ifame也可以跨域获取数据。
+4. window.postMessage	 是HTML5新增在window对象上的方法，目的是为了解决在父子页面上通信的问题。该技术有个专有名词；跨文档消息（cross-document messaging）。利用postMessage的特性可以实现较为安全可信的跨域通信。
+5. 使用代理服务器跨域；
+6. CORS 跨域
+
 <h3 id='20'>20. select 默认选中问题</h3>  
 
 #### 问题描述  
@@ -28,8 +41,8 @@
     
 #### 解决方案 
 
-1. 给select元素pretend一个<option stype="display:none"></option>;
-2. 给select元素pretend一个<option disabled = "disabled"></option>;
+1. 给select元素pretend一个 \<option stype="display:none"></option>;
+2. 给select元素pretend一个 \<option disabled = "disabled"></option>;
 
 <h3 id='19'>19. 兼容脚本</h3>
 
