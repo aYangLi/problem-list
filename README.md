@@ -1,4 +1,11 @@
 ### 目录
+[53. H5 中调相机、多选等问题](#53)  
+[52. 推荐医生白色区块问题](#52)  
+[51. 推荐医生头像问题](#51)  
+[50. IM中输入框的问题](#50)  
+[49. iscroll 和 better-scroll](#49)  
+[48. better-scroll的实现原理](#48)  
+[47. scroll 事件的触发](#47)  
 [46. ios 上 IM 页面路由跳转白屏](#46)  
 [45. Safari 中双指放大缩小问题](#45)  
 [44. vue 中的通信](#44)  
@@ -45,6 +52,84 @@
 [3. 给元素添加事件满足的条件](#3)  
 [2. jQuery 中 trigger 的使用](#2)  
 [1. stick footer 黏性底部](#1)
+
+<h3 id='53'>53. H5 中调相机、多选等问题</h3>  
+
+#### 详情描述
+
+```
+<input type="file" accept="image/*" capture="camera">
+<input type="file" accept="video/*" capture="camcorder">
+<input type="file" accept="audio/*" capture="microphone">
+
+```
+
+capture表示，可以捕获到系统默认的设备，比如：camera--照相机；camcorder--摄像机； microphone--录音。  
+accept表示，直接打开系统文件目录。
+
+其实html5的input:file标签还支持一个multiple属性，表示可以支持多选，如：  
+<input type="file" accept="image/*" multiple>  
+但是安卓不支持多图上传，（会诊项目）
+加上这个multiple后，capture就没啥用了，因为multiple是专门用来支持多选的。
+
+**注意：**  
+input file 标签在安卓上想要掉起相机，需要添加capture="camera"，但是此属性会影响 ios 的掉起相机，在ios上需要取消掉；
+
+<h3 id='52'>52. 推荐医生白色区块问题</h3>  
+
+#### 问题描述  
+
+> 在 ios 上，推荐医生数据超过十条时，渲染不出来，为白色
+    
+#### 解决方案 
+
+替换ul、li标签为section标签；
+具体原因不明
+
+<h3 id='51'>51. 推荐医生头像问题</h3>  
+
+#### 问题描述  
+
+> 在ios9.3.2上滑动，图片会变成方形，其他手机没问题，。
+    
+#### 解决方案 
+推荐医生医生头像，div 里面套了个 img 标签，只给 div 设置 border-radius: 50%;在 ios9.3.2 上滑动，图片会变成方形，其他手机没问题，给img也添加border-radius: 50%；
+
+<h3 id='50'>50. IM中输入框的问题</h3>  
+
+#### 详情描述
+
+1. ios（特别是UC浏览器）对底部fiexd布局，兼容不好，再聚焦的时候fiexd会漂，所以不能用fiexd布局；
+2. ios底部输入框用的是relative，absolute会再部分ios机子上全屏感觉有个遮罩层，使全屏不可点，点的时候有个黑色透明的遮罩层闪烁；
+3. android 底部输入框用的是absolute，relative 布局在安卓上输入框会覆盖在虚拟键盘下面；
+4. ios11.1.2 对面几种布局支持性都不好，当虚拟键盘出来后，输入框不会被挤到上面（因为body高度不变）；解决方式比较暴力，判断是ios11.1.2，数据框聚焦把body变为50%，失焦恢复；
+
+<h3 id='49'>49. iscroll 和 better-scroll</h3>  
+
+#### 详情描述
+
+iscroll 和 better-scroll 的对比
+iscroll的兼容性比较强，用requestAnimationFrame（表意为“请求动画帧”）实现，可以兼容到 ie6，requestAnimationFrame是根据浏览器的最小渲染值来触发；达到流畅效果；但是已经停止维护
+better-scroll 是滴滴负责人黄轶写的，使用css3和requestAnimationFrame；默认优先使用css3，参数可以配置；
+
+<h3 id='48'>48. better-scroll的实现原理</h3>  
+
+#### 详情描述
+
+父容器固定高度，并设置属性 overflow:hidden，使得子元素高度超出容器后能被隐藏。better-scroll作用在父容器上。通过touch事件给子容器设置transform：translate()translateZ();  
+**注意：**   
+Vue中数据更新是异步的，在数据还没有加载完之前，BScroll是无法获取目标内容容器的高度的，就会出现无法滚动的现象。
+
+<h3 id='47'>47. scroll 事件的触发</h3>  
+
+#### 详情描述
+
+```
+window.addEventListener('scroll',function () {
+
+})
+//ios上只会在滚动稳定后出发；安卓会有间隔的持续触发；
+```
 
 
 <h3 id='46'>46. ios 上 IM 页面路由跳转白屏</h3>  
