@@ -1,4 +1,7 @@
 ### 目录
+[67. 移动端页面viewport缩放比不等于1时文本膨胀现象](#67)  
+[66. IOS safari下后退按钮js代码不会执行](#66)  
+[65. IE6.0-8.0不支持使用 rgba 模式实现透明度](#65)  
 [64. 在微博浏览器上背景问题](#64)  
 [63. 埋点时，hash 改变没出发 hashChange 事件](#63)  
 [62. input 上传第二次不能选择同一文件](#62)  
@@ -62,7 +65,77 @@
 [4. 按钮置灰不能点击的方法](#4)  
 [3. 给元素添加事件满足的条件](#3)  
 [2. jQuery 中 trigger 的使用](#2)  
-[1. stick footer 黏性底部](#1)  
+[1. stick footer 黏性底部](#1)
+
+<h3 id="67">67. 移动端页面viewport缩放比不等于1时文本膨胀现象</h3>
+
+#### 问题描述
+
+```
+<meta name="viewport" content="width=device-width, initial-scale=1">
+```
+
+或是：
+
+```
+<meta name ="viewport" content ="initial-scale=1, maximum-scale=1, minimum-scale=1">
+```
+
+> 当initial-scale取值不等于1时，移动端页面可能出现：文本字号与CSS设置的font-size不一致，比font-size大许多的情况。  
+该现象称为Font Boosting，是webkit对于移动端页面优化的一种行为。  
+早期前端开发没有对移动端设备实行有效的适配时，PC端页面在移动端看来会显得极小，影响用户体验。  
+Webkit工作组为使用户不必滑动屏幕或双击放大屏幕也能看清页面内容，提出了Font Boosting特性。但它目前往往造成不必要的结果。  
+它的计算公式较为复杂，但实测可能在28px以上触发。
+
+#### 解决方案
+
+避免其生效的方法有两种：
+
+1. 指定viewport width=320，其余属性取默认值（即不作设置）；
+2. 将发生Font Boosting的元素显式设置宽高度；
+
+显然以上两种方法均不适用，但对于方法2而言，max-height同样生效。  
+因此解决方法为：设置元素max-height：100%即可。  
+
+
+<h3 id="66">66. IOS safari下后退按钮js代码不会执行</h3>
+
+#### 问题描述
+
+> 在当前页面进入下一页面,返回后js代码不执行,获取接口数据后,不会执行代码,
+
+#### 解决方案
+hack方法：加入iframe强制刷新后,去除
+```
+function(title){
+   var u = navigator.userAgent;
+   var isIOS = !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/); //ios终端
+   document.title= title;//添加标题
+   if(isIOS){
+       // hack在IOS微信等webview中无法修改document.title的情况
+       var $iframe = $('<iframe src="/favicon.ico"></iframe>').on('load', function() {
+           setTimeout(function() {
+               $iframe.off('load').remove()
+           }, 0)
+       }).appendTo($('body'))
+   }
+};
+```
+
+<h3 id="65">65. IE6.0-8.0不支持使用 rgba 模式实现透明度</h3>
+
+
+#### 问题描述
+
+> IE6.0-8.0不支持使用 rgba 模式实现透明度
+
+#### 解决方案
+可使用 IE 滤镜处理
+           需要使用
+           
+```
+filter: progid:DXImageTransform.Microsoft.Gradient(startColorstr=#88000000, endColorstr=#88000000);
+```
 
 <h3 id='64'>64. 在微博浏览器上背景问题</h3>  
 
