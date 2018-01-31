@@ -1,4 +1,17 @@
 ### 目录
+[46. ios 上 IM 页面路由跳转白屏](#46)  
+[45. Safari 中双指放大缩小问题](#45)  
+[44. vue 中的通信](#44)  
+[43. es6 新增方法处理](#43)  
+[42. 页面唤起拨打电话](#42)  
+[41. vue 双向绑定数据限制长度](#41)  
+[40. vue中 v-if 遇到的问题](#40)  
+[39. vue中 keep-alive 的使用](#39)  
+[38. 数组的过滤器 filter 的问题](#38)  
+[37. 在不翻墙的情况下下载vue调试插件（vue-DevTools）](#37)  
+[36. vue中 v-if 和 v-show](#36)  
+[35. 视频中的坑](#35)  
+[34. 滚动穿透问题](#34)  
 [33. app引导页的判断](#33)  
 [32. 页面跳转的方式以及区别](#32)  
 [31. 什么是 URL Schema？](#31)  
@@ -32,6 +45,269 @@
 [3. 给元素添加事件满足的条件](#3)  
 [2. jQuery 中 trigger 的使用](#2)  
 [1. stick footer 黏性底部](#1)
+
+
+<h3 id='46'>46. ios 上 IM 页面路由跳转白屏</h3>  
+
+#### 问题描述  
+
+> vue 手机端项目在进入主页后在进入子页面，直接按返回出现空白情况，然后轻触一下，空白区域就消失了  
+安卓手机上不会，ios 会出现这种情况。
+    
+#### 解决方案 
+这是safari的ios render blank.
+
+```
+//拿到数据之后
+this.$nextTick(() => {
+	window.scrollTo(0, 1)
+	window.scrollTo(0, 0)
+})
+```
+
+
+<h3 id='45'>45. Safari 中双指放大缩小问题</h3>  
+
+#### 问题描述  
+
+> 为了提高Safari中网站的辅助功能，即使网站在视口中设置了user-scalable = no，用户也可以手动缩放。
+    
+#### 解决方案 
+监听事件来阻止
+
+```
+window.onload=function () {  
+ 	document.addEventListener('touchstart',function (event) {  
+        if(event.touches.length>1){  
+            event.preventDefault();  
+        }  
+    })  
+    var lastTouchEnd=0;  
+    document.addEventListener('touchend',function (event) {  
+        var now=(new Date()).getTime();  
+        if(now-lastTouchEnd<=300){  
+            event.preventDefault();  
+        }  
+        lastTouchEnd=now;  
+    },false)  
+}  
+```
+淘宝的解决方案也是如此 ；但是并不能很好的解决；
+
+<h3 id='44'>44. vue 中的通信</h3>  
+
+#### 详情描述
+
+##### 父子组件通信：
+1. 子组件触发父组件函数：
+
+```
+子组件：
+<template>
+    <button @click="submit">提交</button>
+</template>
+<script>
+export default {
+  props: {
+    onsubmit: {
+      type: Function,
+      default: null
+    }
+  },
+  methods: {
+    submit: function () {
+      if (this.onsubmit) {
+        this.onsubmit(‘cc12345’)
+      }
+    }
+  }
+}
+</script>
+父组件：
+<template>
+    <editor id="editor" class="editor" :onsubmit="cc"></editor>
+</template>
+<script>
+export default {
+  methods: {
+    cc: function (str) {
+      alert(str)
+    }
+  }
+}
+</script>
+```
+
+2. 子组件修改父组件传过来的值:this.$emit('update:foo', newValue);父组件通过v-bind绑定并且写上.aync；
+3. 由于javascript的特性，父组件像子组件传一个对象，子组件修改也会出发父组件变化；
+
+##### 非父子组件通信
+
+1. 	用一个新的 vue 实列管理
+```
+var bus = new Vue()
+// 触发组件 A 中的事件
+bus.$emit('id-selected', 1)
+// 在组件 B 创建的钩子中监听事件
+bus.$on('id-selected', function (id) {
+ 		 // ...
+})
+```
+2. 用vuex状态管理
+ 
+
+<h3 id='43'>43. es6 新增方法处理</h3>  
+
+#### 详情描述
+es6中Array.includes和Object.assign方法在部分浏览器中支持性不太好，需要用babel-polyfill处理。
+
+<h3 id='42'>42. 页面唤起拨打电话</h3>  
+
+#### 详情描述
+1. window.location.href = "tel:010-59007006";支持性比较好，ios、安卓都支持
+2. 用 a 标签：
+
+```
+<a href="tel:010-59007006" class="make-call" ref="makeCall"></a>；
+//直接点击ios、安卓都支持、但是使用自动触发安卓支持、ios支持不太好；
+```
+
+
+<h3 id='41'>41. vue 双向绑定数据限制长度</h3>  
+
+#### 问题描述  
+
+> vue中输入框v-modle 双向绑定的数据；在需要的业务场景下需要对其进行字数长度限制；
+    
+#### 解决方案 
+可以使用以下方法：  
+1. 方法一：
+
+```
+//方法一：输入框添加keypress方法；然后函数为：
+maxLength(attr,length){
+	let keyCode = event.keyCode;
+	console.log("keyCode");
+    	let len=0;
+	console.log(this[attr].length);
+	for (let codePoint of this[attr]) {
+ 		if (this[attr].charCodeAt(codePoint) > 128) {
+    			len += 2;
+  		} else {
+   	 		len++;
+  		}
+    	}
+	if (len < length) {
+  		event.returnValue = true;
+	} else {
+  		event.returnValue = false;
+	}
+},
+//注意：事件必须为keypress；
+//keydown 可以做限制，但是达到长度不可以删除；keyup不行；
+```
+
+2. 方法二：
+
+```
+//方法二：输入框添加input方法；然后函数为：
+inputMaxLength(attr,length){
+  		this[attr] = api.getStrByteLen(this[attr], length);
+},
+```
+
+**方法对比：**  
+方法一优点，循环少，性能高；缺点，中文输入法空格输入字符的时候不会触发；  
+方法二优点，兼容性好，适合各种场景；缺点，循环多，性能比较差；
+
+<h3 id='40'>40. vue中 v-if 遇到的问题</h3>  
+
+#### 问题描述  
+
+> 在添加患者中；botton 按钮用 v-if 隐藏掉之后，出现了不可见，但是可以点击的情况
+    
+#### 解决方案 
+在 botton 外层添加了一层 session 标签；可能是 v-if 对行内块原理有兼容性；
+
+<h3 id='39'>39. vue中 keep-alive 的使用</h3>  
+
+#### 问题描述  
+
+> 在业务开发中，会有路由跳转但是返回需要保留数据的场景；vue 中提供了 keep-alive 来处理
+    
+#### 解决方案 
+
+返回dom不让其重新刷新，在vue-view外面包一层<keep-alive><keep-alive/>,
+当引入keep-alive的时候，页面第一次进入，钩子的触发顺序created-> mounted-> activated，退出时触发deactivated。当再次进入（前进或者后退）时，只触发activated。  
+事件挂载的方法等，只执行一次的放在 mounted 中；组件每次进去执行的方法放在 activated 中；
+可以将 是否包裹 keep-alive 通过参数配置；
+
+```
+<keep-alive>
+  	<router-view v-if="$route.meta.keepAlive" style="min-height:100%"></router-view>
+</keep-alive>
+<router-view v-if="!$route.meta.keepAlive" style="min-height:100%"></router-view>
+//不需要刷新的路由配置里面配置 meta: {keepAlive: true}, 这个路由则显示在上面标签；
+//需要刷新的路由配置里面配置 meta: {keepAlive: false}, 这个路由则显示在下面标签；
+```
+
+<h3 id='38'>38. 数组的过滤器 filter 的问题</h3>
+
+#### 详情描述
+
+对象或者数组的过滤器filter，不能使用第三方变量过滤；
+比如：var num = value ; return num>0; 必须写成：return value>0;
+
+<h3 id='37'>37. 在不翻墙的情况下下载vue调试插件（vue-DevTools）</h3>
+
+#### 详情描述
+
+1. Chrome地址栏输入"crx.2333.me"
+2. 然后把你要下载的扩展ID填到输入框中，点击"Get"（vue的id：nhdogjmejiglipccpnnnanhbledajbpd）
+3. 点击"成功Get，点我下载"
+4. 或者在github 上搜vue-Devtools
+
+<h3 id='36'>36. vue中 v-if 和 v-show</h3>
+
+#### 详情描述
+
+1. v-if是惰性的，每次false之后会删除元素，这样，每次显示的时候都会重新走选择城市的接口。
+2. v-show，只是简单的显示隐藏
+
+<h3 id='35'>35. 视频中的坑</h3>
+
+#### 详情描述
+[参考自此链接](http://mp.weixin.qq.com/s?__biz=MzI3NTM1MjExMg==&mid=2247484551&idx=1&sn=9d8995a704c3f674673eb41863781263&chksm=eb075bd8dc70d2ce057f257523d33beda366e1ae33db034c641c4070b8c220b85a0cdb58d2b9&mpshare=1&scene=1&srcid=0630AD0ajBVqblfyXGWwgvTU#rd) 以及乔的ppt；
+1. 自动播放问题：
+通过autoplay属性
+视频的自动播放需要在video标签上添加autoplay属性, 如：\<video autoplay>\<video/>  
+但是在很多浏览器里，如 iOS 下并不支持这个属性，在 iOS下必须给webview设置
+self.wView.allowsInlineMediaPlayback = YES;self.wView.mediaPlaybackRequiresUserAction = NO; 
+才能让这个属性生效从而让用户一进入页面就开始视频的自动播放
+在微信下因为不允许视频直接播放，则必须通过用户的真实操作来触发调用video.play(),这就是各种微信的h5活动页面需要引导用户进行一下点击操作才开始的原因。
+2. 页面内联播放问题：在iOS Safari 和一些安卓的一些浏览器下播放视频的时候，不能在h5页面中播放视频，系统会自动接管视频
+如果需要在h5页面内播放视频，需要在视频标签上加上 webkit-playsinline，在iOS10以后，需要加上playsinline,建议同时加上这两个属性，同时需要app支持这种模式，手Q和微信都支持这种模式  
+\<video id="player" webkit-playsinline playsinline > (在html)
+    webview.allowsInlineMediaPlayback = YES(在app内设置webview属性);
+3. 视频的高度问题：在安卓下，一些浏览器如 QQ 浏览器和 UC 浏览器，系统会把视频的层级调到最高，所以如果想在页面上显示 dom 元素，都会被视频盖住，单纯的设置该dom的z-index是无效的  
+**解决方案：**
+    1. 在弹出会显示在视频上方dom的时候暂停视频播放
+    2. 将视频所在的dom的父元素的高度设为1
+    3. 处理完弹出的事件后将视频所在的父元素高度还原
+    4. 视频的默认播放图标
+4. 在 iOS 下会有一个默认的播放图标，在 iOS 都会默认显示，不能通过 js 控制，但是可以通过css样式将其隐藏
+```
+	video::-webkit-media-controls-start-playback-button { display: none;}
+```
+
+    
+
+<h3 id='34'>34. 滚动穿透问题</h3>
+
+#### 详情描述
+解决方法：
+1. 在弹层出现时给body设置position：fixed，top：-滚动条高度；弹层消失的时候获取body的top，$(window).scrollTop(-body的高度)。解决大部分场景，在ios微信浏览器无法禁止微信浏览器原生的弹性黑层；
+2. 用iscroll.js+禁止touch事件（唯医答题用的方法）解决
 
 <h3 id='33'>33. app引导页的判断</h3>
 
