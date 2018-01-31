@@ -1,5 +1,6 @@
 ### 目录
-[19. 兼容脚本题](#19)  
+[20. select 默认选中问题](#20)  
+[19. 兼容脚本](#19)  
 [18. 移动端 border 宽度问题](#18)  
 [17. flex布局中的注意事项](#17)  
 [16. jQuery选取元素](#16)  
@@ -19,7 +20,18 @@
 [2. jQuery 中 trigger 的使用](#2)  
 [1. stick footer 黏性底部](#1)
 
-<h3 id='19'>19. 兼容脚本题</h3>
+<h3 id='20'>20. select 默认选中问题</h3>  
+
+#### 问题描述  
+
+> select 标签会默认选中第一个 option ；但是一般使用的时候不想要默认选中第一个，而是一个空白的选择框
+    
+#### 解决方案 
+
+1. 给select元素pretend一个<option stype="display:none"></option>;
+2. 给select元素pretend一个<option disabled = "disabled"></option>;
+
+<h3 id='19'>19. 兼容脚本</h3>
 
 #### 详情描述
 
