@@ -1,4 +1,15 @@
 ### 目录
+[64. 在微博浏览器上背景问题](#64)  
+[63. 埋点时，hash 改变没出发 hashChange 事件](#63)  
+[62. input 上传第二次不能选择同一文件](#62)  
+[61. im 聊天中视频播放](#61)  
+[60. 移动端 click 事件](#60)  
+[59. 上传图片预览图片方向错误](#59)  
+[58. im 聊天输入框高度问题](#58)  
+[57. 美团技术交流记录](#57)  
+[56. FileReader 对象](#56)  
+[55. ios9 中登录注册多出一条黑线](#55)  
+[54. ios9 以下 flex 兼容问题](#54)  
 [53. H5 中调相机、多选等问题](#53)  
 [52. 推荐医生白色区块问题](#52)  
 [51. 推荐医生头像问题](#51)  
@@ -51,7 +62,170 @@
 [4. 按钮置灰不能点击的方法](#4)  
 [3. 给元素添加事件满足的条件](#3)  
 [2. jQuery 中 trigger 的使用](#2)  
-[1. stick footer 黏性底部](#1)
+[1. stick footer 黏性底部](#1)  
+
+<h3 id='64'>64. 在微博浏览器上背景问题</h3>  
+
+#### 问题描述 
+
+> 在微博浏览器上，页面底部为浅灰色
+    
+#### 解决方案 
+在微博浏览器上；页面底层不设置背景色，在其父级或者body上设置
+ background-color 为需要的对应的颜色；
+
+<h3 id='63'>63. 埋点时，hash 改变没出发 hashChange 事件</h3>  
+
+#### 问题描述 
+
+> 个人中心埋点时，跳转路由没有触发 hashChange 事件
+    
+#### 解决方案 
+vue 2.8.0 以上；vue 触发的 hash 改变，不会触发 hashchage 事件；主张在 路由钩子去完成想要进行的操作；  
+将 vue 回退到了2.6版本；
+
+<h3 id='62'>62. input 上传第二次不能选择同一文件</h3>  
+
+#### 问题描述 
+
+> 在上传图片过程中，同一个 input 选择同一张图片 不会触发 onchange事件，在选择不同图片时，会多次触发onchange事件；刚开始在选择完成后，删除重新初始化一个input ，这个方法有点山炮！！！ 
+    
+#### 解决方案 
+不要采用删除当前input[type=file]这个节点，然后再重新创建dom这种方案，这样是不合理的。  
+**解释如下：**  
+input[type=file]使用的是onchange去做，onchange监听的为input的value值，只有再内容发生改变的时候去触发，而value在上传文件的时候保存的是文件的内容，你只需要在上传成功的回调里面，将当前input的value值置空即可。event.target.value='';
+
+<h3 id='61'>61. im 聊天中视频播放</h3>  
+
+#### 问题描述 
+
+> 在 im 聊天聊天消息为视频时，可以点击播放；ios 会有统一的样式，但是在 android 上，微信平台会自动接管全屏播放，但是在 M 站上样式一踏糊涂；
+    
+#### 解决方案 
+**解决思路：**  
+在 video 播放时，将video 播放设置全屏
+
+```
+//部分安卓机型（vivo x9；小米 note3）im聊天中播放发送的视频；先横屏，再点击播放，才正常；解决方案：先调用全屏的方法；然后再进行播放；
+if (this.$refs.videoHtml.requestFullscreen) {
+  this.$refs.videoHtml.requestFullscreen();
+} else if (this.$refs.videoHtml.mozRequestFullScreen) {
+  this.$refs.videoHtml.mozRequestFullScreen();
+} else if (this.$refs.videoHtml.webkitRequestFullScreen) {
+  this.$refs.videoHtml.webkitRequestFullScreen();
+}
+this.$refs.videoHtml.play();
+//当用户退出播放视频时，还会有声音；
+//解决方案：监听video，退出全屏，video 暂停；
+$(document).on(
+'fullscreenchange webkitfullscreenchange mozfullscreenchange', // 			webkitfullscreenchange/mozfullscreenchange
+  function (evt) {
+    let flag=document.fullscreen || document.webkitIsFullScreen || document.mozFullScreen;
+    if (!flag){
+      that.$refs.videoHtml.pause()
+    }
+  });
+```
+
+
+
+
+<h3 id='60'>60. 移动端 click 事件</h3>  
+
+#### 详情描述
+
+移动端的 click 有300 ms的延时原因：在移动端触发时间会按照 touchstart，touchmove，touchend，click 顺序触发；触发 touchend，click 之间会有200-400不等的时间延时（因为移动端需要判断用户是不是想要进行双击）；  
+fastclick 和 zepto 的tap 事件 都可以解决 300 ms延时；  
+**fastclick 原理：**     
+是在检测到touchend事件的时候，会通过DOM自定义事件立即出发模拟一个click事件，并把浏览器在300ms之后的click事件阻止掉。  
+**tap 原理：**  
+在touchstart 时会记录一个值x1，y1，在touchend时会记录x2，y2，通过对比着几个值，判断用户是否是点击事件，而不是滑动事件，然后直接触发事件；  
+**注意：**  
+fastclick 在ios 上会影响元素自动触发，比如 直接click()；会拦截第一次，需要执行两次click()；才会触发；安卓上不需要；
+
+<h3 id='59'>59. 上传图片预览图片方向错误</h3>  
+
+#### 问题描述 
+
+> ios手机上传竖拍照片会逆时针旋转90度，横拍照片无此问题；Android手机没这个问题。
+    
+#### 解决方案 
+获取到照片拍摄的方向角，对非横拍的ios照片进行角度旋转修正。
+利用exif.js读取照片的拍摄信息；
+唯医骨科项目中用 canvas 把上传图片转为同等大小的图片显示并进行base64压缩上传；
+
+<h3 id='58'>58. im 聊天输入框高度问题</h3>  
+
+#### 问题描述  
+
+> 输入框的高度随着字数增多而增高，但是超过一定高度后，不会增高，场景像微信的输入框一样；刚开始使用 autosize.js 控制 textarea ，但是在 ios11 有兼容问题，不断触发聚焦事件；
+    
+#### 解决方案 
+
+舍弃 autosize.js ，用纯css + html 实现：  
+与textarea放一个平级的 pre 标签与 textarea 双向绑定；textarea 高度设置百分之百；textarea 父级的父级设置一个最大高度；父级不限制，然后textarea字数增加；pre标签也跟着增高，把父级撑开；textarea高度也就跟着父级变化；
+
+<h3 id='57'>57. 美团技术交流记录</h3>  
+
+#### 详情描述
+
+1. **dlpserver**  目前仅在美团内部使用，测试阶段。充分利用 localstorage 缓存js；  
+**思路：**  
+页面引入一个dlp.js，在 a.html 中直接 require('a.js'), dlp.js 会带着 a.js（以及版本号） 去 dlpserver 中去请求，dlpserver 会判断 a.js 依赖哪些模块，哪些js，然后返回相应的 js 以及版本的 md5 加密，dlp.js 收到之后将返回的 js（字符串）eval（）， 下次访问 b.html 时 require('.js')，dpl.js  去请求dlpserver 并且会带着上一次请求过 a.js 以及版本号， 返回 a.js 哪些缓存可以使用，还缺哪些，返回缺的 js 然后到本地 eval（），继续保存到 localstorage 中，localstorage 的限制是 5M，当超过 5M 存储的时候，会删除一半或者 2M。dlpserver 中会有一个版本号记录，想切换哪个版本的的时候直接在 dlpserver 中切换使用哪个版本、则线上就会切换，这样的话，上线只是将 js 版本 push 到 dlpserver 中，既实现了方便的增量上线，也能很快的回滚线上版本；  
+**解决的痛点：**  
+    - webpack 把所有js 打到一个里面，不能够很好的利用缓存，有改动的话就得全部更新；
+    - 把 js 都分开打包，但是 js 请求会更多； 
+    - webpack 把 js 分开打三个包（page包、vender包、common包），有的页面不需要一些公共方法也会被打包进去（目前业内的一种通用方案）；
+2. **hygrid 优化方案：**
+在不影响客户端启动的情况下，在一个合适的时机，启动一个隐藏的 webview；加载一个静态的html页面，从服务端请求一个压缩的 zip（zip文化可以有效的防止被爬） 压缩文件，里面有 vue.js、common.js 等公共js，隐藏的 webview 加载静态的 html 页面直接冲本地调用 vue.js、common.js 并且运行，缓存到内存中。  
+**优点：**  
+减少了启动 webview 的30ms 的时间，减少了公共js 的运行时间；也基本上可以秒开、无白屏；舍弃 react 的原因，react 在低端机上运行加载需要200ms 左右的时间，没有vue 性能好；  
+**缺点：**  
+webview 会一直占用手机运行内存、30M左右；
+3. **api文档：**  
+呈现出来的是类似于我们使用的 apizza 一样，但是效果更好；不一样的地方是 apizza 需要后台去维护，美团的 api 文档是自动更新、自动抓取，不需要后台维护；  
+**思路：**  
+有使用 java 的技术解析后台写的 java接口文件，分析后台接口需要的参数、以及返回的数据；分析后台写的备注；每个备注匹配到相对应的字段后面（需要后台写好清晰明了的备注），在后台构建的时候会自动解析新加的接口和修改的接口；  
+**解决的痛点：**  
+前后台开发文档不同步；后台在写自己代码的备注的同时，还需要再维护开发文档（节省开发效率）；
+4. **活动推广页的制作：**  
+直接在页面拖拽配置：有选项卡、雷达图、按钮、弹窗、可以配置各种动画、交互、答题；配置完成直接确定就可以线上访问；  
+**解决的痛点：**  
+这一套系统运营可以直接根据自己想法随时制作；不要开发人员每次开发；但是开发人员前期需要做大量的工作；
+
+<h3 id='56'>56. FileReader 对象</h3>  
+
+#### 详情描述
+
+HTML5文件操作的api，FileReader接口提供了读取文件的方法和包含读取结果的事件模型。  
+**FileReader对象的方法：**
+1. readAsText：该方法有两个参数，其中第二个参数是文本的编码方式，默认值为 UTF-8。这个方法非常容易理解，将文件以文本方式读取，读取的结果即是这个文本文件中的内容。
+2. readAsBinaryString：该方法将文件读取为二进制字符串，通常我们将它传送到后端，后端可以通过这段字符串存储文件。
+3. readAsDataURL：这是例子程序中用到的方法，该方法将文件读取为一段以 data: 开头的字符串，这段字符串的实质就是 Data URL，Data URL是一种将小文件直接嵌入文档的方案。这里的小文件通常是指图像与 html 等格式的文件。  
+4. 
+**处理事件：**  
+- onabort	当读取操作被中止时调用.
+- onerror	当读取操作发生错误时调用.
+- onload	当读取操作成功完成时调用.
+- onloadend	当读取操作完成时调用,该处理程序在onload或者onerror之后调用.
+- onloadstart	当读取操作将要开始之前调用.
+- onprogress	在读取数据过程中周期性调用
+
+
+<h3 id='55'>55. ios9 中登录注册多出一条黑线</h3>  
+
+#### 问题描述  
+
+> ios9中，登录注册页面 input 框左右多一条黑线，border显示不正常
+
+#### 解决方案 
+
+ios9中，登录注册页面 p>input，input 应该脱离文档流，不然会出现左右多一条黑线，border显示不正常；原因不明；
+
+<h3 id='54'>54. ios9 以下 flex 兼容问题</h3>  
+
+#### 详情描述
+ios9 以下，display:flex 元素的第一级子元素必须是block，否则 flex 布局是不会生效的
 
 <h3 id='53'>53. H5 中调相机、多选等问题</h3>  
 
