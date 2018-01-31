@@ -1,4 +1,5 @@
 ### 目录
+[22. js打开新页面的几种方式](#22)  
 [21. 跨域的方式](#21)  
 [20. select 默认选中问题](#20)  
 [19. 兼容脚本](#19)  
@@ -20,6 +21,14 @@
 [3. 给元素添加事件满足的条件](#3)  
 [2. jQuery 中 trigger 的使用](#2)  
 [1. stick footer 黏性底部](#1)
+
+<h3 id='22'>22. js打开新页面的几种方式</h3>
+
+#### 详情描述
+1. window.location.href=goUrl;
+2. window.open(goUrl,"_self");
+3. location.replace(goUrl);
+4. location.assign(goUrl);
 
 <h3 id='21'>21. 跨域的方式</h3>
 
