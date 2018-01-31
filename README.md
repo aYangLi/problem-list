@@ -1,5 +1,6 @@
 ### 目录
-[15.布局垂直对其的方式](#15)  
+[16.jQuery选取元素](#16)  
+[15.布局垂直对齐的方式](#15)  
 [14.cookie 和 session 的区别](#14)  
 [13.自动登录的实现](#13)  
 [12.移动端的几种适配](#12)  
@@ -15,7 +16,16 @@
 [2.jQuery 中 trigger 的使用](#2)  
 [1.stick footer 黏性底部](#1)
 
-<h3 id='15'>15.布局垂直对其的方式</h3>
+<h3 id='16'>16.jQuery选取元素</h3>
+
+#### 详情描述
+jQuery([selector,[context]])  
+selector:用来查找的字符串  
+context:作为待查找的 DOM 元素集、文档或 jQuery 对象。  
+$("p,div")		找到元素p和div  
+$("p","div")	找到div里面的p
+
+<h3 id='15'>15.布局垂直对齐的方式</h3>
 
 #### 详情描述
 1. 左右容器分别设置display:table-cell；vertical-align:middle;
