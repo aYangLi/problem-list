@@ -1,4 +1,15 @@
 ### 目录
+[33. app引导页的判断](#33)  
+[32. 页面跳转的方式以及区别](#32)  
+[31. 什么是 URL Schema？](#31)  
+[30. app 与 js 之间的交互](#30)  
+[29. window.name 的使用](#29)  
+[28. 代码计时器](#28)  
+[27. canvas图画保存成本地图片的方法](#27)  
+[26. json 的注意事项](#26)  
+[25. input 输入框输入中文](#25)  
+[24. 输入框的事件的几种触发事件对比](#24)  
+[23. jQuery 中 data() 引发的错误](#23)  
 [22. js打开新页面的几种方式](#22)  
 [21. 跨域的方式](#21)  
 [20. select 默认选中问题](#20)  
@@ -21,6 +32,143 @@
 [3. 给元素添加事件满足的条件](#3)  
 [2. jQuery 中 trigger 的使用](#2)  
 [1. stick footer 黏性底部](#1)
+
+<h3 id='33'>33. app引导页的判断</h3>
+
+#### 详情描述
+1. 判断是否是第一次打开，本地存储一个标识符，第一次打开后设置为true，以后进入判断该标志符，为false则可以进入引导页；
+2. 判断是否是同一版本号，进入时判断本地保存的版本号和打开的版本号是否是同一版本号，如果不是，则进入引导页，并且把版本号设置为当前版本号；
+
+<h3 id='32'>32. 页面跳转的方式以及区别</h3>
+
+#### 详情描述
+跳转方式有：
+- window.location.href,
+- window.location.replace(),
+- window.location.reload()  
+
+三者的区别：
+  1. window.location.href=“url”：改变url地址；
+  2. window.location.replace(“url”)：将地址替换成新url，该方法通过指定URL替换当前缓存在历史里（客户端）的项目，因此当使用replace方法之后，你不能通过“前进”和“后 退”来访问已经被替换的URL，这个特点对于做一些过渡页面非常有用！
+  3. window.location.reload()：强制刷新页面，从服务器重新请求！
+解决的问题，在app中嵌套的网页中，收到传的参数时，用replace替换当前url。且不加入历史栈
+
+<h3 id='31'>31. 什么是 URL Schema？</h3>
+
+#### 详情描述
+
+Android中的scheme是一种页面内跳转协议，是一种非常好的实现机制，通过定义自己的scheme协议，可以非常方便跳转app中的各个页面；通过scheme协议，服务器可以定制化告诉App跳转那个页面，可以通过通知栏消息定制化跳转页面，可以通过H5页面跳转页面等。  
+[详细链接点此进入](http://blog.csdn.net/ruingman/article/details/70054670)
+
+
+
+<h3 id='30'>30. app 与 js 之间的交互</h3>
+
+#### 详情描述
+采用的框架是 WebViewJavascriptBridge，采用这套框架可以方便的使 native 与 JS 交互  
+[详细链接点此进入](http://www.cnblogs.com/TheYouth/p/5854467.html)
+
+<h3 id='29'>29. window.name 的使用</h3>
+
+#### 详情描述
+window.name	给当前窗口起名字，iframe也可这样使用。  
+name 在全局下是关键字；  
+window.open('','MyName','width=200,height=100')；  
+- 参数一：url，打开的链接；
+- 参数二：打开窗口的名字；
+- 参数三：打开窗口的大小px；
+应用场景：
+1. 用来判断此窗口是刷新，还是重新打开的窗口，来执行不同的操作；
+2. 跨域（待补充）；
+
+<h3 id='28'>28. 代码计时器</h3>
+
+#### 详情描述
+
+```
+console.time("main");
+console.timeEnd("main")。
+```
+
+<h3 id='27'>27. canvas图画保存成本地图片的方法</h3>
+
+#### 详情描述
+
+```
+var oCanvas = document.getElementById("thecanvas");
+Canvas2Image.saveAsPNG(oCanvas);  // 这将会提示用户保存PNG图片
+Canvas2Image.saveAsJPEG(oCanvas); // 这将会提示用户保存JPG图片
+Canvas2Image.saveAsBMP(oCanvas);  // 这将会提示用户保存BMP图片
+// 返回一个包含PNG图片的<img>元素
+var oImgPNG = Canvas2Image.saveAsPNG(oCanvas, true); 
+// 返回一个包含JPG图片的<img>元素
+var oImgJPEG = Canvas2Image.saveAsJPEG(oCanvas, true); 
+// 返回一个包含BMP图片的<img>元素
+var oImgBMP = Canvas2Image.saveAsBMP(oCanvas, true);
+```
+
+<h3 id='26'>26. json 的注意事项</h3>
+
+#### 详情描述
+
+自己写的json字符串中必须用双引号。使用单引号无法转换成json对象；
+
+<h3 id='25'>25. input 输入框输入中文</h3>  
+
+#### 问题描述  
+
+> 在input输入框输入中文时，需要即时查询出匹配输入内容的结果，一般我们会使用input事件监听用户输入事件，但是在输入汉语拼音时，也会触发input事件，前端就会不断发送请求，用户体验非常差劲。
+    
+#### 解决方案 
+针对这种情况，给大家介绍一个简单易懂的好方法。代码如下：
+```
+function in2 () {
+	var cpLock = false;
+    $('#in2').on('compositionstart', function () {
+        cpLock = true;
+        console.log("中文输入：开始");
+		$("span").text("kaishi");
+		$(this).off("input");
+    });
+    $('#in2').on('compositionend', function () {
+        cpLock = false;
+        console.log("中文输入：结束")
+		$("span").text("jieshu");
+		console.log($(this).val().length);
+		$(this).on('input', function () {
+            if (!cpLock) {
+                console.log($(this).val().length);
+            }
+        });
+
+	});
+}
+```
+**原理：**  
+当浏览器有非直接的文字输入时, compositionstart 事件会以同步模式触发.  
+当浏览器是直接的文字输入时, compositionend 会以同步模式触发.  
+当元素监听到 compositionstart 事件，给 input 中事件加锁，禁止 input中事件执行，  
+当元素监听到 compositionend 事件，给input中事件解锁，正常执行。
+
+<h3 id='24'>24. 输入框的事件的几种触发事件对比</h3>
+
+#### 详情描述
+1. change事件    触发事件必须满足两个条件：
+    - 当前对象属性改变，并且是由键盘或鼠标事件激发的（脚本触发无效）
+    - 当前对象失去焦点(onblur)
+2. keypress  恩，还好。。。。。就是能监听键盘事件，鼠标复制黏贴操作他就无能为力
+3. propertychange（ie）和input事件
+
+input是标准的浏览器事件，一般应用于input元素，当input的value发生变化就会发生，无论是键盘输入还是鼠标黏贴的改变都能及时监听到变化  
+propertychange，只要当前对象属性发生改变。
+
+<h3 id='23'>23. jQuery 中 data() 引发的错误</h3>
+
+#### 详情描述
+jQuery 中 data()解释为可以获取、设置元素自定义的属性，但是尽量不用data()方法去获取元素的自定义属性；因为会引发一些隐形错误；
+1. 只能获取到第一次赋值的属性，之后通过修改的值获取不到；
+2. 如果值是string类型的数字，比如“123”，获取的时候会强转为number，123；
+3. 所以建议还是使用 $("div").attr() 的方法去获取
 
 <h3 id='22'>22. js打开新页面的几种方式</h3>
 
