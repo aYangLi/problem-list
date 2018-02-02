@@ -1,4 +1,5 @@
 ### 目录
+[69. vsCode 开发微信小程序插件](#69)  
 [68. vsCode 配置 html 文件警告](#68)  
 [67. 移动端页面viewport缩放比不等于1时文本膨胀现象](#67)  
 [66. IOS safari下后退按钮js代码不会执行](#66)  
@@ -67,6 +68,20 @@
 [3. 给元素添加事件满足的条件](#3)  
 [2. jQuery 中 trigger 的使用](#2)  
 [1. stick footer 黏性底部](#1)
+
+<h3 id="69">69. vsCode 开发微信小程序插件</h3>
+
+#### 问题描述
+
+> 用微信开发者工具开发微信小程序不适应；没事，我们还有强大的 vsCode；
+
+#### 解决方案
+
+用 vsCode 开发微信小程序可以配置以下插件，让开发更美好：
+1. vscode weapp api
+2. vscode wxml
+3. vscode-wechat
+4. 有个和 vsCode 差不多，还可以预览的 IDE：Egret Wing；
 
 <h3 id="68">68. vsCode 配置 html 文件警告</h3>
 
