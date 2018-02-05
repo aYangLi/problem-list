@@ -1,4 +1,5 @@
 ### 目录
+[70. ios 上浏览器返回上一页不会刷新页面问题，页面初始化的方法不执行](#70)  
 [69. vsCode 开发微信小程序插件](#69)  
 [68. vsCode 配置 html 文件警告](#68)  
 [67. 移动端页面viewport缩放比不等于1时文本膨胀现象](#67)  
@@ -69,6 +70,42 @@
 [2. jQuery 中 trigger 的使用](#2)  
 [1. stick footer 黏性底部](#1)
 
+<h3 id="70">70. ios 上浏览器返回上一页不会刷新页面问题，页面初始化的方法不执行</h3>
+
+#### 问题描述
+
+> 在 ios 上浏览器返回上一页不会刷新页面问题，页面初始化的方法不执行，造成了很多意外情况，这个问题不能忍；
+
+#### 解决方案
+
+1. 方法一：hack方法，加入iframe强制刷新后,去除
+
+```
+function(title){
+   var u = navigator.userAgent;
+   var isIOS = !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/); //ios终端
+   document.title= title;//添加标题
+   if(isIOS){
+       // hack在IOS微信等webview中无法修改document.title的情况
+       var $iframe = $('<iframe src="/favicon.ico"></iframe>').on('load', function() {
+           setTimeout(function() {
+               $iframe.off('load').remove()
+           }, 0)
+       }).appendTo($('body'))
+   }
+};
+```
+2. 方法二：利用 onpageshow 事件触发：
+
+```
+window.onpageshow=function(e){
+    if(e.persisted) {
+        window.location.reload() 
+    }
+};
+```
+
+
 <h3 id="69">69. vsCode 开发微信小程序插件</h3>
 
 #### 问题描述
@@ -81,7 +118,8 @@
 1. vscode weapp api
 2. vscode wxml
 3. vscode-wechat
-4. 有个和 vsCode 差不多，还可以预览的 IDE：Egret Wing；
+4. Easy WXLESS
+5. 有个和 vsCode 差不多，还可以预览的 IDE：Egret Wing；
 
 <h3 id="68">68. vsCode 配置 html 文件警告</h3>
 
@@ -501,7 +539,7 @@ export default {
 
 ##### 非父子组件通信
 
-1. 	用一个新的 vue 实列管理
+1. 用一个新的 vue 实列管理
 ```
 var bus = new Vue()
 // 触发组件 A 中的事件
