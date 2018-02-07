@@ -1,9 +1,9 @@
 ### 目录
-[70. ios 上浏览器返回上一页不会刷新页面问题，页面初始化的方法不执行](#70)  
-[69. vsCode 开发微信小程序插件](#69)  
-[68. vsCode 配置 html 文件警告](#68)  
-[67. 移动端页面viewport缩放比不等于1时文本膨胀现象](#67)  
-[66. IOS safari下后退按钮js代码不会执行](#66)  
+[70. npm 发布更新包失败问题](#70)  
+[69. ios 上浏览器返回上一页不会刷新页面问题，页面初始化的方法不执行](#69)  
+[68. vsCode 开发微信小程序插件](#68)  
+[67. vsCode 配置 html 文件警告](#67)  
+[66. 移动端页面viewport缩放比不等于1时文本膨胀现象](#66)  
 [65. IE6.0-8.0不支持使用 rgba 模式实现透明度](#65)  
 [64. 在微博浏览器上背景问题](#64)  
 [63. 埋点时，hash 改变没出发 hashChange 事件](#63)  
@@ -70,7 +70,18 @@
 [2. jQuery 中 trigger 的使用](#2)  
 [1. stick footer 黏性底部](#1)
 
-<h3 id="70">70. ios 上浏览器返回上一页不会刷新页面问题，页面初始化的方法不执行</h3>
+<h3 id="70">70. npm 发布更新包失败问题</h3>
+
+#### 问题描述
+
+> 好久不更新的包今天想起来更新一下，但是 npm publish 的时候显示失败，然后开始找原因
+
+#### 解决方案
+
+1. 如果是已经发布过的包，则要修改 package.json 的verson 版本；
+2. 一般在项目中 npm 源下载包比较慢，所以检查下当前全局使用的是那个源，上传包更新包的时候只能使用 npm 源；
+
+<h3 id="69">69. ios 上浏览器返回上一页不会刷新页面问题，页面初始化的方法不执行</h3>
 
 #### 问题描述
 
@@ -106,7 +117,7 @@ window.onpageshow=function(e){
 ```
 
 
-<h3 id="69">69. vsCode 开发微信小程序插件</h3>
+<h3 id="68">68. vsCode 开发微信小程序插件</h3>
 
 #### 问题描述
 
@@ -121,7 +132,7 @@ window.onpageshow=function(e){
 4. Easy WXLESS
 5. 有个和 vsCode 差不多，还可以预览的 IDE：Egret Wing；
 
-<h3 id="68">68. vsCode 配置 html 文件警告</h3>
+<h3 id="67">67. vsCode 配置 html 文件警告</h3>
 
 #### 问题描述
 
@@ -131,7 +142,7 @@ window.onpageshow=function(e){
 
 在当前项目的根目录下添加 .htmlhintrc 文件，vs 检查规则会通过这个文件；但是规则如何填写呢？ 可以去 [http://htmlhint.com/](http://htmlhint.com/) 配置自己的忽略格式选项，配置完成下载下来粘贴到 .htmlhintrc 就ok了。
 
-<h3 id="67">67. 移动端页面viewport缩放比不等于1时文本膨胀现象</h3>
+<h3 id="66">66. 移动端页面viewport缩放比不等于1时文本膨胀现象</h3>
 
 #### 问题描述
 
@@ -160,31 +171,6 @@ Webkit工作组为使用户不必滑动屏幕或双击放大屏幕也能看清�
 
 显然以上两种方法均不适用，但对于方法2而言，max-height同样生效。  
 因此解决方法为：设置元素max-height：100%即可。  
-
-
-<h3 id="66">66. IOS safari下后退按钮js代码不会执行</h3>
-
-#### 问题描述
-
-> 在当前页面进入下一页面,返回后js代码不执行,获取接口数据后,不会执行代码,
-
-#### 解决方案
-hack方法：加入iframe强制刷新后,去除
-```
-function(title){
-   var u = navigator.userAgent;
-   var isIOS = !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/); //ios终端
-   document.title= title;//添加标题
-   if(isIOS){
-       // hack在IOS微信等webview中无法修改document.title的情况
-       var $iframe = $('<iframe src="/favicon.ico"></iframe>').on('load', function() {
-           setTimeout(function() {
-               $iframe.off('load').remove()
-           }, 0)
-       }).appendTo($('body'))
-   }
-};
-```
 
 <h3 id="65">65. IE6.0-8.0不支持使用 rgba 模式实现透明度</h3>
 
@@ -263,8 +249,6 @@ $(document).on(
     }
   });
 ```
-
-
 
 
 <h3 id='60'>60. 移动端 click 事件</h3>  
