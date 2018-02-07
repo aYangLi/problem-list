@@ -1,4 +1,5 @@
 ### 目录
+[72. webpack 构建 npm 包优化](#72)  
 [71. parcel 报错问题](#71)  
 [70. npm 发布更新包失败问题](#70)  
 [69. ios 上浏览器返回上一页不会刷新页面问题，页面初始化的方法不执行](#69)  
@@ -70,6 +71,32 @@
 [3. 给元素添加事件满足的条件](#3)  
 [2. jQuery 中 trigger 的使用](#2)  
 [1. stick footer 黏性底部](#1)
+
+<h3 id='72'>72. webpack 构建 npm 包优化</h3>  
+
+#### 详情描述
+webpack可用来构建发布到npm上去的给别人调用的js库,以下方案可以减少 npm 包的体积；
+
+```
+const nodeExternals = require('webpack-node-externals');
+module.exports = {
+  entry: {
+    index: './src/index.js',
+  },
+  externals: [nodeExternals()],
+  target: 'node',
+  output: {
+    path: path.resolve(__dirname, '.npm'),
+    filename: '[name].js',
+    libraryTarget: 'commonjs2',
+  },
+};
+```
+这里有几个区别于web应用不同的地方：
+
+- externals: [nodeExternals()]用于排除node_modules目录下的代码被打包进去，因为放在node_modules目录下的代码应该通过npm安装。  
+- libraryTarget: 'commonjs2'指出entry是一个可供别人调用的库而不是可执行的，输出的js文件按照commonjs规范。
+
 
 <h3 id="71">71. parcel 报错问题</h3>
 
