@@ -1,4 +1,5 @@
 ### 目录
+[73. input 聚焦掉起键盘，并且只能输入数字](#73)  
 [72. webpack 构建 npm 包优化](#72)  
 [71. parcel 报错问题](#71)  
 [70. npm 发布更新包失败问题](#70)  
@@ -71,6 +72,60 @@
 [3. 给元素添加事件满足的条件](#3)  
 [2. jQuery 中 trigger 的使用](#2)  
 [1. stick footer 黏性底部](#1)
+
+<h3 id="73">73. input 聚焦掉起键盘，并且只能输入数字</h3>
+
+#### 问题描述
+
+> 在实际项目开发中，会有需求为 input 聚焦掉起键盘，并且只能数字，开发者第一反应为 type 修改 number，但是 number 是允许输入 + - . e 四个字符的，以下是项目中的解决思路；
+
+#### 解决方案
+1.方法一：
+
+```
+<template>
+    <input
+        type="number"
+        placeholder="请输入手机号"
+        name="phone"
+        @keypress="onKeyPress()"
+        v-model="phoneMessage"
+        :class="{'hasContent':phoneMessage.length>0}"
+    >
+</template>
+<script>
+    onKeyPress () {
+        event.returnValue = /[\d]/.test(String.fromCharCode(event.keyCode));
+    }
+</script>
+
+```
+以上方法在 pc 端可以，但是移动端 keypress 不会触发（移动端会触发 keyon 和 keydown），并且移动端输入小数点之后， phoneMessage 会变为空，所以不太完善。  
+
+2.方法二
+
+```
+<template>
+    <input
+        type="number"
+        placeholder="请输入手机号"
+        name="tel"
+        @input="onInput()"
+        v-model="phoneMessage"
+        :class="{'hasContent':phoneMessage.length>0}"
+    >
+</template>
+<script>
+    onInput () {
+        let content = this.phoneMessage.split("").filter( (item,index) => {
+            return /^[0-9]*$/.test(item) && index < 11;
+        }).join("");
+        this.phoneMessage = content;
+    }
+</script>
+```
+这种方案思路是将 input type 变为 tel，这样，在移动端只能掉起数字键盘，并且输入其他字符时，也能正常触发 input 事件，然后通过 js 来截取所需要的内容（京东的登录也是这种方案）；
+
 
 <h3 id='72'>72. webpack 构建 npm 包优化</h3>  
 
