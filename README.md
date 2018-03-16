@@ -82,7 +82,13 @@
 
 #### 解决方案
 
-如果把 image 文件夹手动放到dist 目录下，是正常可以找到的。 是不是 mpvue 没有把需要的图片打到 dist 下，需要自己手动添加（自己猜测！）。等待 mpvue 修复这个问题；
+1.方法一：  
+如果把 image 文件夹手动放到dist 目录下，是正常可以找到的。 是不是 mpvue 没有把需要的图片打到 dist 下，需要自己手动添加（自己猜测！）。等待 mpvue 修复这个问题；期望能到达到自己设一个 image ，自己控制；
+
+2.方法二：  
+官方给的解释是这样操作：把图片文件放到 static 文件夹下去引入；  
+
+![image](https://raw.githubusercontent.com/aYangLi/image-folder/master/youdao/mpvue-tabbar.png)  
 
 <h3 id="73">73. input 聚焦掉起键盘，并且只能输入数字</h3>
 
