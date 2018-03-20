@@ -1,4 +1,5 @@
 ### 目录
+[75. wepy mpvue 和原生开发小程序对比](#75)  
 [74. mpvue 配置 tabBar 图片路径出错](#74)  
 [73. input 聚焦掉起键盘，并且只能输入数字](#73)  
 [72. webpack 构建 npm 包优化](#72)  
@@ -73,6 +74,12 @@
 [3. 给元素添加事件满足的条件](#3)  
 [2. jQuery 中 trigger 的使用](#2)  
 [1. stick footer 黏性底部](#1)
+
+<h3 id='75'>75. wepy mpvue 和原生开发小程序对比</h3>  
+
+#### 详情描述
+
+[移驾我的博客查看](http://blog.csdn.net/yang450712123/article/details/79623518)
 
 <h3 id="74">74. mpvue 配置 tabBar 图片路径出错</h3>
 
