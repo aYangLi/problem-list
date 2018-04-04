@@ -1,4 +1,5 @@
 ### 目录
+[76. node 获取本机 ip 地址](#76)  
 [75. wepy mpvue 和原生开发小程序对比](#75)  
 [74. mpvue 配置 tabBar 图片路径出错](#74)  
 [73. input 聚焦掉起键盘，并且只能输入数字](#73)  
@@ -74,6 +75,29 @@
 [3. 给元素添加事件满足的条件](#3)  
 [2. jQuery 中 trigger 的使用](#2)  
 [1. stick footer 黏性底部](#1)
+
+<h3 id="76">76. node 获取本机 ip 地址</h3>
+
+#### 问题描述
+
+>开发 H5 时，经常会使用真机进行调试本地环境、webpack 配置服务器好多脚手架写的都是固定的，而在团队开发中需要每人配置自己的本机 ip 进行开发，每次开启开发环境的都需要修改，并且还不能提到 git ，麻烦，所以找了方法，动态获取本机 ip 进行，本地环境真机调试；
+
+#### 解决方案
+
+```
+let IPAdress = '';
+for(var devName in interfaces){  
+  var iface = interfaces[devName];  
+  for(var i=0;i<iface.length;i++){  
+        var alias = iface[i];  
+        if(alias.family === 'IPv4' && alias.address !== '127.0.0.1' && !alias.internal){  
+              IPAdress = alias.address;  
+        }  
+  }  
+} 
+console.log(IPAddress);
+```
+
 
 <h3 id='75'>75. wepy mpvue 和原生开发小程序对比</h3>  
 
