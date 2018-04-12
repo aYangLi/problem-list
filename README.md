@@ -1,4 +1,5 @@
 ### 目录
+[77. vue 在 model 修改的数据没有响应式](#77)  
 [76. node 获取本机 ip 地址](#76)  
 [75. wepy mpvue 和原生开发小程序对比](#75)  
 [74. mpvue 配置 tabBar 图片路径出错](#74)  
@@ -75,6 +76,35 @@
 [3. 给元素添加事件满足的条件](#3)  
 [2. jQuery 中 trigger 的使用](#2)  
 [1. stick footer 黏性底部](#1)
+
+<h3 id="77">77. vue 在 model 修改的数据没有响应式</h3>
+
+#### 问题描述
+
+>在 vue 的实际项目开发时，有时会遇到在 model 中修改的数据没有同步改变到 view 层，而慢一步，找了找原因，如下：
+
+#### 解决方案
+
+Vue 不允许在已经创建的实例上动态添加新的根基响应式属性（root-level reactive proiperty）。然后它可以使用 Vue.set(object,key, value)方法将响应属性添加到嵌套的对象上：
+
+```
+Vue.set(vm.someObject,'b',2);
+```
+您还可以使用 vm.$set 实例方法，这也是全局 Vue.set 方法的别名：
+
+```
+this.$set(this.someObject,'b',2);
+// 上面情况实践中出错的地方：im 聊天中上传图片给其设置 loading 的时候。
+```
+
+有时你想向已有对象上添加一些属性，例如使用 Object.assign() 或 _.extend() 方法来添加属性。但是，添加到对象上的新属性不会触发更新。在这种情况下可以创建一个新的对象，让他包含原对象的属性和新的属性；
+
+```
+// 代替 `Object.assign(this.someObject,{a:1,b:2})`
+this.someObject = Object.assign({},this.someObject,{a:1,b:2})
+// 出错的地方；im中用 vuex 管理医生数据，使用了注销的那种方案没有得到同步更新；
+```
+
 
 <h3 id="76">76. node 获取本机 ip 地址</h3>
 
