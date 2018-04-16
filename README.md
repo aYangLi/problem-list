@@ -1,4 +1,5 @@
 ### 目录
+[78. 华为 mate8 拍照上传图片失败](#78)  
 [77. vue 在 model 修改的数据没有响应式](#77)  
 [76. node 获取本机 ip 地址](#76)  
 [75. wepy mpvue 和原生开发小程序对比](#75)  
@@ -76,6 +77,59 @@
 [3. 给元素添加事件满足的条件](#3)  
 [2. jQuery 中 trigger 的使用](#2)  
 [1. stick footer 黏性底部](#1)
+
+<h3 id="78">78. 华为 mate8 拍照上传图片失败</h3>
+
+#### 问题描述
+
+>在上传图片时，华为 mate8 掉起相册可以正常上传，但是掉起相机拍照片时，上传失败（仅限于原生浏览器）。场景：咨询流程上传图片，上传检查检验
+
+#### 解决方案
+
+通过 debugger ，发现，mate8 在原生浏览器拍照上传时，有一个小坑，拍完照获取的照片名字有两个 '.' ,所以截取到的名字后台识别不了，错误名字实例为：xxxxx.xxxxx.jpg；前端解决方案如下：
+
+```
+// file 为文件对象
+let _fileName = "",
+  _rex = /\./g,
+  _rex2 = /\&/g;
+let _fileLocalName = "";
+if (files.name.match(_rex).length == 1) {
+_fileName = files.name.split(".")[1];
+_fileLocalName = files.name;
+} else {
+_fileName = files.name.split(".")[2];
+_fileLocalName =
+  files.name.split(".")[0] +
+  files.name.split(".")[1] +
+  "." +
+  files.name.split(".")[2];
+}
+if (_fileLocalName.indexOf("&") > 0) {
+_fileLocalName = _fileLocalName.replace(_rex2, "");
+}
+//上传请求
+api.ajax({
+url: XHRList.imgCreate,
+method: "POST",
+data: {
+  fileContent: base64
+    .split(",")[1]
+    .replace(/\+/g, "%2B")
+    .replace(/\n/g, ""),
+  fileName: _fileLocalName,
+  extName: _fileName,
+},
+timeout: 300000,
+done(res) {
+ 
+},
+fail(res) {
+  
+}
+});
+```
+
 
 <h3 id="77">77. vue 在 model 修改的数据没有响应式</h3>
 
