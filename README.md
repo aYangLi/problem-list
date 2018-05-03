@@ -240,7 +240,7 @@ console.log(IPAddress);
 ```
 <template>
     <input
-        type="number"
+        type="tel"
         placeholder="请输入手机号"
         name="tel"
         @input="onInput()"
