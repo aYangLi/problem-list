@@ -1,4 +1,5 @@
 ### 目录
+[79. webpack 热更新优化](#79)  
 [78. 华为 mate8 拍照上传图片失败](#78)  
 [77. vue 在 model 修改的数据没有响应式](#77)  
 [76. node 获取本机 ip 地址](#76)  
@@ -77,6 +78,48 @@
 [3. 给元素添加事件满足的条件](#3)  
 [2. jQuery 中 trigger 的使用](#2)  
 [1. stick footer 黏性底部](#1)
+
+<h3 id="79">79. webpack 热更新优化</h3>
+
+#### 问题描述
+
+>在多页面项目开发中，开发环境的热更新下，会发现随着页面的增多，热更新的编译时间会越来越长，本人项目在十几页的情况下，编译达到30s，这无疑浪费了时间。以下是一种解决方案；
+
+#### 解决方案
+
+这种方案的思路为，开发环境中，每人负责的都是一部分模块或者组件，所以热更新可以只编译自己当前需要的页面，而没必要把所有的页面全部编译。创建一个 selfConfig.js 设置需要保存的页面，然后在 webpack 配置中，配置，只属于需要的页面去编译热更新。加快开发环境中的编译速度。
+
+
+```
+// selfConfig.js
+module.exports = [
+    'imScence',
+    'mLogin',
+];
+```
+
+
+```
+// webpack.base.conf.js  
+// 部分关键代码
+const selfConfig = require("./selfConfig");
+
+for (let moduleName of modules) {
+  if (selfConfig.length === 0) {
+    devEntries[moduleName] = path.join(resolve('src'), 'modules', moduleName, 'main.js');
+  } else {
+    if (selfConfig.includes(moduleName)) {
+      devEntries[moduleName] = path.join(resolve('src'), 'modules', moduleName, 'main.js');
+    }
+  }
+  buildEntries[moduleName] = path.join(resolve('src'), 'modules', moduleName, 'main.js');
+}
+
+```
+以上事例设置完成后，只会热更新两个页面，但是这种方案的弊端是，其他页面本地环境将是白屏打不开（因为压根没编译），所以这种方案还是根据适合自己的场景使用。
+
+**注意：** 每次修改 selfConfig.js 需要重起 webpack 服务。
+
 
 <h3 id="78">78. 华为 mate8 拍照上传图片失败</h3>
 
