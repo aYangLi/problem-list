@@ -1,4 +1,5 @@
 ### 目录
+[80. wx.showToast() 在真机中闪烁一下消失](#80)  
 [79. webpack 热更新优化](#79)  
 [78. 华为 mate8 拍照上传图片失败](#78)  
 [77. vue 在 model 修改的数据没有响应式](#77)  
@@ -79,6 +80,35 @@
 [2. jQuery 中 trigger 的使用](#2)  
 [1. stick footer 黏性底部](#1)
 
+<h3 id="80">80. wx.showToast() 在真机中闪烁一下消失</h3>
+
+#### 问题描述
+
+>在真实的业务场景下，请求接口需要调用 wx.showLoading(),接口请求结束调用 wx.hideLoading()。如果需要给用户提示错误信息，调用 wx.showToast(),在模拟器上没事，但是在真机上会出现提示信息闪烁一下，然后消失。
+
+#### 解决方案
+
+这个问题出现的原因就是因为小程序的内部处理 wx.showLoading() 和 wx.showToast() 调用的是同一个框，都受 wx.hideToast() 或者 wx.hideLoading() 的影响。  
+比如在真机上你的代码顺序为 wx.showLoading() =>wx.hideLoading() => wx.showToast() ;但是实际你看到的现象是 wx.showLoading() => wx.showToast() =>wx.hideLoading()，受到最后的 wx.hideLoading() 影响，toast 框闪烁一下就消失；  
+**解决方法如下：**
+
+```
+wx.showLoading();
+wx.hideLoading();
+setTimeout( () => {
+  wx.showToast({
+    title: '提示的错误术语',
+    icon: "none",
+  });
+  setTimeout( () =>{
+    wx.hideToast();  
+  },2000)
+},0);
+
+// 看到代码就明白了，其实就是把 wx.showToast() 放到事件队列的队尾去执行。
+```
+
+
 <h3 id="79">79. webpack 热更新优化</h3>
 
 #### 问题描述
@@ -94,7 +124,7 @@
 // selfConfig.js
 module.exports = [
     'imScence',
-    'mLogin',
+    'mLogin'
 ];
 ```
 
