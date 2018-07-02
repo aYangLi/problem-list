@@ -1,4 +1,5 @@
 ### 目录
+[82. 微信小程序同声传译 Face2FaceTranslator 开发](#82)  
 [81. ios 手机端 input 框上方有内阴影](#81)  
 [80. wx.showToast() 在真机中闪烁一下消失](#80)  
 [79. webpack 热更新优化](#79)  
@@ -81,7 +82,15 @@
 [2. jQuery 中 trigger 的使用](#2)  
 [1. stick footer 黏性底部](#1)
 
+<h3 id='82'>82. 微信小程序同声传译 Face2FaceTranslator 开发</h3>  
+
+#### 详情描述
+
+[移驾我的博客查看](https://blog.csdn.net/yang450712123/article/details/80881387)
+
 <h3 id="81">81. ios 手机端 input 框上方有内阴影</h3>
+
+#### 解决方案
 
 1. 方法一：
 
@@ -101,9 +110,6 @@ input{
 }
 ```
 
-
-
-#### 解决方案
 
 <h3 id="80">80. wx.showToast() 在真机中闪烁一下消失</h3>
 
