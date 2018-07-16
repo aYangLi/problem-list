@@ -1,4 +1,5 @@
 ### 目录
+[85. webpack vue 打包优化](#85)  
 [84. 荣耀 10 字体显示错误，顶部部分遮掩](#84)  
 [83. mpvue 中插槽 slot 没有渲染出来](#83)  
 [82. 微信小程序同声传译 Face2FaceTranslator 开发](#82)  
@@ -83,6 +84,71 @@
 [3. 给元素添加事件满足的条件](#3)  
 [2. jQuery 中 trigger 的使用](#2)  
 [1. stick footer 黏性底部](#1)
+
+<h3 id="85">85.webpack vue 打包优化</h3>
+
+#### 问题描述
+
+>在项目优化中，有一种方案，不经常更新的第三方包可以不打在 vendor.js 中，可以在 .html 模板中引入，然后在 webpack 中配置排除这些包，但是会遇到一个问题，就是开发环境中，如果排除掉 vue.js 不打入 vendor.js 中，则无法使用 vue devtools 进行调试，如果不排除 vue.js ，则又会和模板中引入的 vue.js 冲突报错，以下是我的解决方案；
+
+#### 解决方案
+
+**思路：** 
+1. 在 webpack 配置中，根据环境变量来判断是否排除 vue；
+2. 在 HtmlWebpackPlugin 插件中传参需要插入的 vue.js 的 script 引入的字符串；
+3. 在 html 模板中写入模板语法，动态注入 vue.js;
+4. 通过 ejs-loader 编译 html 中的模板语法；
+
+**关键代码如下** 
+
+webpack.base.conf.js
+```
+// webpack.base.conf.js
+
+let externals = {
+  'vuex': 'Vuex',
+  'vue-router': 'VueRouter',
+  'jquery': 'jQuery',
+  'mint-ui': 'mintUi',
+  'vueg': 'vueg',
+}
+
+if (process.env.NODE_ENV === 'production') {
+  Object.assign(externals, {
+    'vue': 'Vue',
+  })
+}
+
+module.exports = {
+  externals,
+  module: {
+    rules: [
+      {
+        test:/\.html$/,
+        loader:'ejs-loader',
+      },
+    ]
+  }      
+}  
+```
+
+webpack.prod.conf.js
+```
+// webpack.prod.conf.js
+
+webpackConfig.plugins.push(new HtmlWebpackPlugin({
+  script:'<script src="https://cdn.bootcss.com/vue/2.5.15/vue.min.js"></script>',
+}));
+```
+
+.html 模板中
+```
+// .html
+
+<%=htmlWebpackPlugin.options.script%>
+```
+
+
 
 <h3 id="84">84. 荣耀 10 字体显示错误，顶部部分遮掩</h3>
 
