@@ -1,4 +1,5 @@
 ### 目录
+[87.padStart is not a function](#87)  
 [86. 微信小程序Push场景本地调试方法](#86)  
 [85. webpack vue 打包优化](#85)  
 [84. 荣耀 10 字体显示错误，顶部部分遮掩](#84)  
@@ -85,6 +86,16 @@
 [3. 给元素添加事件满足的条件](#3)  
 [2. jQuery 中 trigger 的使用](#2)  
 [1. stick footer 黏性底部](#1)
+
+<h3 id="87">87.padStart is not  a function</h3>
+
+#### 问题描述
+
+>微信小程序开发时，控制台padStart is not  a function；
+
+#### 解决方案
+
+不用这个方法了呗，或者自己重新在 String.prototype.padStart 中自己实现，毕竟是 es6 之后的方法，经测试，微信6.6.6版本不支持，6.6.10 版本支持，和版本也有一定的关系，期望以后的支持性越来约好了；
 
 <h3 id="86">86.微信小程序Push场景本地调试方法</h3>
 
