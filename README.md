@@ -1,4 +1,6 @@
 ### 目录
+[95. 富文本解析 wxParse 解析数据造成页面假死](#95)  
+[94. 微信小程序页面按钮分享好友缩略图截取顶部](#94)   
 [93. git dist 目录排除不了](#93)   
 [92. 微信小程序 canvas 问题](#92)   
 [91. 微信小程序 wx.reLaunch 执行前几个页面的 onUnload 钩子](#91)  
@@ -92,6 +94,107 @@
 [3. 给元素添加事件满足的条件](#3)  
 [2. jQuery 中 trigger 的使用](#2)  
 [1. stick footer 黏性底部](#1)
+
+<h3 id="95">95.富文本解析 wxParse 解析数据造成页面假死</h3>
+
+#### 问题描述
+
+>小程序中总有富文本解析的场景，比如：头条的终端页。我们的终端页使用了 wxParse, 但是由于 wxParse有些小问题，并且项目使用 mpvue，所以把
+wxParse 拉到本地做了一些魔改，但是依然遇到性能瓶颈，数据过多造成页面假死，相对于小程序原生的 rich-text 富文本解析组件；wxparse 的功能性更丰富，支持 video；
+
+#### 解决方案
+由于数据过多而造成页面假死，那就从数据层的角度考虑，把数据分段加载，关键部分代码如下：
+
+```
+<template>
+  <!--基础元素-->
+  <div class="wxParse" :class="className" v-if="!loading">
+    <block v-for="(node,index) of nodes" :key="index">
+      <wxParseTemplate :node="node"/>
+    </block>
+  </div>
+</template>
+
+<script>
+let query = null;
+let scrollTime = null;
+let nodesData = [];
+export default {
+    data() {
+      return {
+        nodes:[], // 计算属性中的 nodes 放到 data 里
+      };
+    },
+    onPageScroll(e){
+      if (!nodesData.length) return;
+      if (scrollTime) clearTimeout(scrollTime);
+      scrollTime = setTimeout( ()=> {
+        query.exec((res) => {
+          clearTimeout(scrollTime);
+          console.log('res');
+          console.log(res);
+          console.log(e);
+          if (e.scrollTop > (res[0].height/2)) {
+            console.log('我要加载');
+            this.nodes.push(...nodesData.splice(0,15));
+          }
+        })
+      },100);
+    },
+    onLoad() {
+      nodesData = [];
+      console.log('wxParse start');
+      query = wx.createSelectorQuery();
+      query.select('.wxParse').boundingClientRect();
+      nodesData = this.getNodes();
+      this.nodes.push(...nodesData.splice(0,25));
+    },
+    onUnload () {
+      nodesData = [];
+      if (scrollTime) clearTimeout(scrollTime);
+    },
+    methods: {
+      getNodes () {
+        const {
+          content,
+          noData,
+          imageProp,
+          startHandler,
+          endHandler,
+          charsHandler,
+        } = this;
+        const parseData = content || noData;
+        const customHandler = {
+          start: startHandler,
+          end: endHandler,
+          chars: charsHandler,
+        };
+        const results = HtmlToJson(parseData, customHandler, imageProp, this);
+        this.imageUrls = results.imageUrls;
+        return results.nodes;
+      },
+    },
+}
+</script>
+
+```
+上面方法的思路是在页面滑动的时候对数据进行分段加载，但是通过实践，发现如果终端页要跳转其他页面，返回之后还是会把剩余数据加载完，依旧造成页面卡死，还有问题就是刚进入页面解析数据，比如有贴底按钮无法点击（此时在解析数据）。最终还是重新自写了个 parse，如果对于需求比较简单的，推荐小程序原生的
+rich-text，如果数据较少， wxParse 还行，如果数据量过大，慎用！！！
+<h3 id="94">94. 微信小程序页面按钮分享好友缩略图截取顶部</h3>
+
+#### 问题描述
+
+>微信小程序转发会默认截取当前页面的当前作为转发好友的缩略图，但是 PM 想实现转发的时候用当前页面的顶部UI作为转发缩略图。
+
+#### 解决方案
+其实方案就是将页面滑动到顶部，但是注意一定要加延时才起效果，以下是代码
+
+```
+wx.pageScrollTo({
+  scrollTop:  0,
+  duration: 100
+});
+```
 
 <h3 id="93">93. git dist 目录排除不了</h3>
 
