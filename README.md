@@ -1,4 +1,5 @@
 ### 目录
+[98. window.__wxjs_environment  为 Undefined](#98)  
 [97. audio 标签自动播放不起作用或者 play() 报错](#97)   
 [96. a 标签 download 属性不起作用，或者下载的图片无法查看](#96)   
 [95. 富文本解析 wxParse 解析数据造成页面假死](#95)  
@@ -96,6 +97,32 @@
 [3. 给元素添加事件满足的条件](#3)  
 [2. jQuery 中 trigger 的使用](#2)  
 [1. stick footer 黏性底部](#1)
+
+<h3 id="98">98. window.__wxjs_environment  为 Undefined</h3>
+
+#### 问题描述
+
+>微信小程序的 webview 中在网页内可通过window.__wxjs_environment变量判断是否在小程序环境，但是在真实项目中发现有时 window.__wxjs_environment 为 undefined；  
+
+#### 解决方案
+这个全局变量建议在WeixinJSBridgeReady回调中使用，也可以使用JSSDK 1.3.2提供的getEnv接口，代码如下：
+```
+// web-view下的页面内
+function ready() {
+  console.log(window.__wxjs_environment === 'miniprogram') // true
+}
+if (!window.WeixinJSBridge || !WeixinJSBridge.invoke) {
+  document.addEventListener('WeixinJSBridgeReady', ready, false)
+} else {
+  ready()
+}
+
+// 或者
+wx.miniProgram.getEnv(function (res) {
+  console.log(res.miniprogram) // true
+})
+```
+
 
 <h3 id="97">97. audio 标签自动播放不起作用或者 play() 报错</h3>
 
