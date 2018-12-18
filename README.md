@@ -1,4 +1,5 @@
 ### 目录
+[99. ios微信小程序中 input 输入框问题，输入的光标中的内容自动清空](#99)  
 [98. window.__wxjs_environment  为 Undefined](#98)  
 [97. audio 标签自动播放不起作用或者 play() 报错](#97)   
 [96. a 标签 download 属性不起作用，或者下载的图片无法查看](#96)   
@@ -97,6 +98,91 @@
 [3. 给元素添加事件满足的条件](#3)  
 [2. jQuery 中 trigger 的使用](#2)  
 [1. stick footer 黏性底部](#1)
+
+<h3 id="99">99.ios微信小程序中 input 输入框问题，输入的光标中的内容自动清空</h3>
+
+#### 问题描述
+
+>1.我在页面上有个倒计时的功能，每一秒都在更新时间，更新时间显示的值（view一直变）   
+2.我调用input输入框，准备输入内容，每次倒计时秒数变得时候，光标的内容自动全部清空
+
+具体场景描述请见下图：  
+
+![image](https://raw.githubusercontent.com/aYangLi/image-folder/master/youdao/ios-input.gif)
+#### 解决方案
+
+这个问题是 mpvue 处理定时器和 input 输入框在ios上的兼容问题；问题连接附上：  
+
+[github issuse 直达车](https://github.com/Meituan-Dianping/mpvue/issues/353)  
+
+github 上有道友出了几个方案，但是都没有解决我的项目场景；最后捋了捋思路：既然 input 绑定数据会和定时器冲突，那就可以不绑定；代码如下（简写思路）：
+
+
+```
+<template>
+    <figure class="main-input-box-textarea-inner" v-if="textareaShow">
+        <section class="area-content">
+              <input class="main-input-box-textarea"
+                     v-if="textareaShow"
+                     type="text"
+                     @input="inputFunc"
+                     maxlength="500"
+                     @focus="scrollToBottom()" cursor-spacing="5"/>
+              <div class="main-input-box-textarea" v-if="!textareaShow"></div>
+        </section>
+        <button class="main-input-box-send" :class="{'on':sendTextContent.length}" @click="sendMessage"
+                type="submit" formType="submit">发送
+        </button>
+    </figure>
+</template>
+<script type="text/ecmascript-6">
+export default {
+    methods: {
+        inputFunc (e) {
+            console.log(e.target.value)
+            this.sendTextContent = e.target.value
+        },
+        sendMessage() {
+            if (this.sendTextContent.trim().length === 0) {
+              return false;
+            } else {
+              this.textareaShow = false;//这里是重点
+              if (!this.clickFlag) return false;
+              this.clickFlag = false;
+              console.log(this.sendTextContent.trim().substring(0,20));
+              dataLog.createTrack({
+                actionId: 14202,
+                keyword: this.sendTextContent.trim()
+              });
+              imBaseMethods.sendMessage({
+                target: this.targetData.account,
+                sendContent: this.sendTextContent.trim(),
+                custom: JSON.stringify({
+                  cType: "1",
+                  cId: this.doctorCustomerId,
+                  mType: "0",
+                  conId: this.orderSourceId
+                }),
+                needPushNick: false,
+                pushContent: `患者${this.patientName ? this.patientName : ""}:${this.sendTextContent.trim().substring(0,20)}`,
+                pushPayload: JSON.stringify({
+                  account: "0_" + this.caseId,
+                  type: "1"
+                }),
+              }).then(obj => {
+                this.textareaShow = true; //这里是重点
+                this.setFocus = true;
+                this.sendMessageSuccess(obj);
+              }).catch((err, obj) => {
+                this.sendFail(err, obj)
+              });
+            }
+          },
+    }
+}
+</script>
+```
+
 
 <h3 id="98">98. window.__wxjs_environment  为 Undefined</h3>
 
