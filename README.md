@@ -1,4 +1,5 @@
 ### 目录
+[100. position 设置属性 absolute 之后，width 的值出现不固定](#100)  
 [99. ios微信小程序中 input 输入框问题，输入的光标中的内容自动清空](#99)  
 [98. window.__wxjs_environment  为 Undefined](#98)  
 [97. audio 标签自动播放不起作用或者 play() 报错](#97)   
@@ -98,6 +99,19 @@
 [3. 给元素添加事件满足的条件](#3)  
 [2. jQuery 中 trigger 的使用](#2)  
 [1. stick footer 黏性底部](#1)
+
+<h3 id="100">100.position 设置属性 absolute 之后，width 的值出现不固定</h3>
+
+#### 问题描述
+页面布局中有一些场景需要设置盒子的 css 样式 position:absolute,
+但是之后不设置 width 的具体值，会出现意想不到的宽度，出现折行啊等样式错乱
+
+#### 解决方案
+原因是当设置了 position:absolute 之后，该元素的witdh、height会根据父元素（需设置position:relative，没有则按浏览器作为父元素）的width、height和该元素left、bottom、top、right而改变。  
+**计算公式为：**  
+该元素的witdh = 父元素的width-top-bottom；  
+该元素的height= 父元素的height-left-right；
+所以根据具体的页面布局，设置宽高，防止出现意想不到的样式错乱
 
 <h3 id="99">99.ios微信小程序中 input 输入框问题，输入的光标中的内容自动清空</h3>
 
