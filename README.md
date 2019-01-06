@@ -1,4 +1,5 @@
 ### 目录
+[101. mac nginx 初次配置的默认路径](#101)  
 [100. position 设置属性 absolute 之后，width 的值出现不固定](#100)  
 [99. ios微信小程序中 input 输入框问题，输入的光标中的内容自动清空](#99)  
 [98. window.__wxjs_environment  为 Undefined](#98)  
@@ -99,6 +100,27 @@
 [3. 给元素添加事件满足的条件](#3)  
 [2. jQuery 中 trigger 的使用](#2)  
 [1. stick footer 黏性底部](#1)
+
+<h3 id="101">101. mac nginx 初次配置的默认路径</h3>
+
+#### 问题描述
+mac 上初次配置 nginx，会出现找不见默认路径的情况，以下是总结的默认路径
+
+#### 解决方案
+nginx 默认安装的地方（默认的配置文件路径）
+
+```
+/usr/local/etc/nginx
+```
+
+nginx 默认配置文件配置的是 8080 端口，会返回一个默认的 index.html 页面，这个 index.html 页面路径为下
+
+```
+// [version] 为 nginx 的版本
+
+/usr/local/Cellar/nginx/[version]/html
+
+```
 
 <h3 id="100">100.position 设置属性 absolute 之后，width 的值出现不固定</h3>
 
