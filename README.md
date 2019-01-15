@@ -1,4 +1,5 @@
 ### 目录
+[102. 微信小程序 webview 页面刷新](#102)  
 [101. mac nginx 初次配置的默认路径](#101)  
 [100. position 设置属性 absolute 之后，width 的值出现不固定](#100)  
 [99. ios微信小程序中 input 输入框问题，输入的光标中的内容自动清空](#99)  
@@ -101,6 +102,77 @@
 [2. jQuery 中 trigger 的使用](#2)  
 [1. stick footer 黏性底部](#1)
 
+<h3 id="102">102. 微信小程序 webview 页面刷新</h3>
+
+#### 问题描述
+
+在微信小程序原生页面做了操作，数据发生改变，回到 webview 页面时需要更新 webview 里面的数据。由于小程序没有提供与 webview 的实时通信能力，因此刷新页面是个可考虑的做法。
+
+#### 解决方案
+首先，解决回到 webview 刷新的问题，webview 自带缓存，直接物理键返回，或者 back api 返回，都不会更新实时数据，这个问题可以利用 onShow 生命周期，在 onShow 生命周期中改变 webview 的 src 属性；  
+
+**注意：**  
+在 onShow 中改变 src 链接时，需要改变 src 的原链接，如果直接赋值原链接，不会起作用，所以需要在 query 参数再加上时间戳，才能让当前 webview 刷新页面；  
+
+**引发的问题：**  
+这种处理方式页面是会更新了。但是会增加webview的浏览history，导致用户在后退的时候，会在webview内退到前一个页面，而不是退到小程序的前一个页面。
+
+**处理方式：**  
+首先，让webview做条件渲染；需要刷新时，先把webviewUrl设为空，销毁当前webview。然后再把webviewUrl设为当前值。最终综合解决方式如下：
+
+
+```
+<template>
+  <div>
+    <!--此处是重点-->
+    <web-view v-if="webViewUrl.length" :src="webViewUrl"></web-view>
+  </div>
+</template>
+
+<script>
+  import api from "common/js/util/util";
+
+  export default {
+    data() {
+      return {
+        webViewUrl:''
+      }
+    },
+    onShow(){
+      //此处是重点
+      if(wx.getStorageSync('isJournalBack')){
+        let urlTemp = this.webViewUrl;
+        this.webViewUrl = '';
+        wx.removeStorageSync('isJournalBack');
+        setTimeout( () => {
+          this.webViewUrl=urlTemp.split('?')[0]+'?flag='+Date.parse(new Date())+'&' + urlTemp.split('?')[1];
+        }, 100)
+      }
+    },
+    onLoad(option) {
+      if(wx.getStorageSync('isJournalBack')){
+        wx.removeStorageSync('isJournalBack');
+      }
+      let str='/dist/journalList.html';
+      if(JSON.stringify(option) !== '{}'){
+        str+='?';
+        for (var i in option){
+          str+=i+'='+option[i]+'&'
+        }
+        str=str.slice(0,str.length-1);
+      }
+      this.webViewUrl = `${api.httpEnv()}${decodeURIComponent(str)}`
+      console.log(this.webViewUrl)
+    },
+  }
+</script>
+
+```
+
+这样便可以在不影响导航栏历史的情况下刷新页面，也可以是跳转url。
+这里重新赋值 url 之后，页面内容的更新应该是异步执行的，因此我们后一次修改 url 需要延时一小段时间，否则会出现 error 。
+猜测重新赋值 url 后页面实际更新应该是在下一次的 requestAnimationFrame ，因此如果页面完全不卡顿可能16ms就可以了，保险起见，我设了100ms。
+
 <h3 id="101">101. mac nginx 初次配置的默认路径</h3>
 
 #### 问题描述
@@ -121,6 +193,70 @@ nginx 默认配置文件配置的是 8080 端口，会返回一个默认的 inde
 /usr/local/Cellar/nginx/[version]/html
 
 ```
+
+如果是用 brew 安装，则： brew info nginx，则可以得到所有信息
+ 
+```
+brew info nginx
+nginx: stable 1.15.8 (bottled), HEAD
+HTTP(S) server and reverse proxy, and IMAP/POP3 proxy server
+https://nginx.org/
+/usr/local/Cellar/nginx/1.15.8 (23 files, 1.4MB) *
+  Poured from bottle on 2019-01-05 at 20:05:47
+From: https://github.com/Homebrew/homebrew-core/blob/master/Formula/nginx.rb
+==> Dependencies
+Required: openssl ✔, pcre ✔
+Optional: passenger ✘
+==> Options
+--with-passenger
+	Compile with support for Phusion Passenger module
+--HEAD
+	Install HEAD version
+==> Caveats
+Docroot is: /usr/local/var/www
+
+The default port has been set in /usr/local/etc/nginx/nginx.conf to 8080 so that
+nginx can run without sudo.
+
+nginx will load all files in /usr/local/etc/nginx/servers/.
+```
+
+或者是用命令 nginx -V 查看，如下：
+
+```
+nginx -V
+nginx version: nginx/1.15.8
+built by clang 10.0.0 (clang-1000.11.45.5)
+built with OpenSSL 1.0.2q  20 Nov 2018
+TLS SNI support enabled
+configure arguments: --prefix=/usr/local/Cellar/nginx/1.15.8
+--sbin-path=/usr/local/Cellar/nginx/1.15.8/bin/nginx
+--with-cc-opt='-I/usr/local/opt/pcre/include -I/usr/local/opt/openssl/include'
+--with-ld-opt='-L/usr/local/opt/pcre/lib -L/usr/local/opt/openssl/lib'
+--conf-path=/usr/local/etc/nginx/nginx.conf
+--pid-path=/usr/local/var/run/nginx.pid
+--lock-path=/usr/local/var/run/nginx.lock
+--http-client-body-temp-path=/usr/local/var/run/nginx/client_body_temp
+--http-proxy-temp-path=/usr/local/var/run/nginx/proxy_temp
+--http-fastcgi-temp-path=/usr/local/var/run/nginx/fastcgi_temp
+--http-uwsgi-temp-path=/usr/local/var/run/nginx/uwsgi_temp
+--http-scgi-temp-path=/usr/local/var/run/nginx/scgi_temp
+--http-log-path=/usr/local/var/log/nginx/access.log
+--error-log-path=/usr/local/var/log/nginx/error.log
+--with-debug --with-http_addition_module
+--with-http_auth_request_module --with-http_dav_module
+--with-http_degradation_module --with-http_flv_module
+--with-http_gunzip_module --with-http_gzip_static_module
+--with-http_mp4_module --with-http_random_index_module
+--with-http_realip_module --with-http_secure_link_module
+--with-http_slice_module --with-http_ssl_module
+--with-http_stub_status_module --with-http_sub_module
+--with-http_v2_module --with-ipv6 --with-mail
+--with-mail_ssl_module --with-pcre --with-pcre-jit
+--with-stream --with-stream_realip_module
+--with-stream_ssl_module --with-stream_ssl_preread_module
+```
+
 
 <h3 id="100">100.position 设置属性 absolute 之后，width 的值出现不固定</h3>
 
