@@ -1,4 +1,5 @@
 ### 目录
+[103. 微信小程序 1rpx border ios 真机显示不全](#103)  
 [102. 微信小程序 webview 页面刷新](#102)  
 [101. mac nginx 初次配置的默认路径](#101)  
 [100. position 设置属性 absolute 之后，width 的值出现不固定](#100)  
@@ -101,6 +102,48 @@
 [3. 给元素添加事件满足的条件](#3)  
 [2. jQuery 中 trigger 的使用](#2)  
 [1. stick footer 黏性底部](#1)
+
+<h3 id="103">103. 微信小程序 1rpx border ios 真机显示不全</h3>
+
+#### 问题描述
+
+在微信小程序的原生页面，ios 真机上 1rpx border 会出现个别边显示不全的情况；
+
+#### 解决方案
+这里先放上问题直通车：[微信小程序1rpx border ios真机显示不全问题分析及解决方案](https://blog.csdn.net/c5211314963/article/details/80323443)
+
+经过分析：当标签的父容器宽度(单位rpx)÷2的值为偶数或偶数.5的时候会出现该bug,那么我们可以推到出用200.5\*2=401,302\*2=604等等都会重现这个bug；
+
+所以解决方案为：
+那么解决方案就来了：
+
+1）第一种方式是设置标签父容器的宽度到无bug值，即(奇数或奇.5)\*2,例如281\*2rpx,281.5\*2rpx可以解决;
+
+2）第二种方式是补充像素单位：
+
+步骤1中wxml增加space的view后如下：
+
+```
+<view class='label-con'>
+    <view class='space'></view>
+    <view class='label'>中国移动</view>
+    <view class='label'>苏宁</view>
+    <view class='label'>阿里巴巴</view>
+    <view class='label'>华为</view>
+</view>
+```
+
+步骤1中wxss中增加space类为：
+
+```
+.space{
+    width: 1rpx;
+    height: 100%;
+    float: left;
+}
+```
+以上两种方式即可解决该问题。
+**具体原因和解决方案请点击上面直通车**
 
 <h3 id="102">102. 微信小程序 webview 页面刷新</h3>
 
