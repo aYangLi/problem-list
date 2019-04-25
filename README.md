@@ -1,4 +1,9 @@
 ### 目录
+[110. vsCode git 操作提示 Permission denied, please try again](#110)  
+[109. 微信小程序设置超出行显示 ... 与展开更多按钮](#109)  
+[108. 微信小程序设置超出隐藏，点击加载更多实现动画效果](#108)  
+[107. vsCode 配置 easy sass 插件转换 css、wxss、acsss](#107)  
+[106. vsCode 配置 easy less 插件转换 css、wxss、acss](#106)  
 [105. 微信小程序中 input 的自定义删除按钮点不了](#105)  
 [104. 微信公众号通知和服务通知](#104)  
 [103. 微信小程序 1rpx border ios 真机显示不全](#103)  
@@ -104,6 +109,351 @@
 [3. 给元素添加事件满足的条件](#3)  
 [2. jQuery 中 trigger 的使用](#2)  
 [1. stick footer 黏性底部](#1)
+
+<h3 id="110">110. vsCode git 操作提示 Permission denied, please try again</h3>
+
+#### 问题描述
+
+在 gitlab 仓库已经添加了 ssh key 之后，用 vsCode 或者 sourcetree 克隆或者操作仓库，还是会提示 Permission denied, please try again
+
+#### 解决方案
+
+如果正确配置了 ssh key，则已经有了权限，但是每次提示 Permission denied, please try again 是因为需要 root 密码获取 ~/.ssh/id_rsa.pub 的 key；所以，在终端里执行以下命令：
+
+
+```
+ssh-add ~/.ssh/id_rsa
+```
+
+ssh-add 这个命令不是用来永久性的记住你所使用的私钥的。实际上，它的作用只是把你指定的私钥添加到 ssh-agent 所管理的一个 session 当中。而 ssh-agent 是一个用于存储私钥的临时性的 session 服务，所以每次重启都会失效，都需要再次执行命令。
+
+以前有个方法 ssh-add -K privateKey 可以把私钥存到 keychain 中，重启后也不需要手动 ssh-add ，这个方法现在不行了，找了好久终于找到了解决方法
+
+方法思路依然是利用上述原理，每次电脑开机自动执行 ssh-add 方法，参考文献如下：
+
+[mac下解决开机需要每次ssh-add的问题](https://www.jianshu.com/p/ada03bd51ed5)
+
+**注意：**  
+上面链接方法中添加运行的命令 ssh-add ~/.ssh/id_rsa 依然会报没有权限，然后我修改为 ssh-add -A 则好了（具体原因不明）
+
+<h3 id="109">109. 微信小程序设置超出行显示 ... 与展开更多按钮</h3>
+
+#### 问题描述
+
+业务开发中会有一些场景，超出一行显示 ... 与展开更多按钮，展开更多按钮可以切换显示一行还是全部内容，少于一行正常显示；
+
+#### 解决方案
+
+**分析下问题：** 一般这种需求不好实现的原因是，在移动端，每行显示的字数的有可能在不同机型会有差异，所以就使开发者无法知道这些内容是否超过一行，是否该显示展开更多按钮。  
+
+绕开上述原因，曲线救国，我们在每次页面渲染完成之后再去获取承载内容的元素宽度，和承载内容的元素的外层父级盒子的宽度相对比，如果宽度之差小于半个字体的大小（是为了防止一点误差），则显示 ... 的样式，显示展开更多按钮，相反，则隐藏更多按钮。
+
+**最终效果如下：**
+
+![image](https://raw.githubusercontent.com/aYangLi/image-folder/master/youdao/animation-2.gif)
+
+主要代码如下
+
+
+```
+<view class="coupon-remark-wrapper">
+    <!--id = toggle-warpper 为包裹内容的父级元素-->
+    <view class="coupon-remark-content" id="toggle-wrapper">
+        <!--id = toggle-content 为内容的容器，控制显示全部内容还是显示超出一行... -->
+        <view id="toggle-content" class="{{toggleParams.toggleFlag === 1?'ellipsis':''}}" hidden="{{toggleParams.toggleFlag === 0}}">
+            {{couponData.limitRemark}}
+        </view>
+        <!--class = toggle-icon 为展开更多按钮-->
+        <image class="toggle-icon {{toggleParams.toggleFlag === 1?'hide':'show'}}" wx:if="{{toggleParams.toggleShow}}" bindtap="toggleHandler" src="https://img.dmallcdn.com//dshop/201904/b1c5af14-f29a-494c-9e3b-899f1a2cf218"></image>
+    </view>
+</view>
+```
+
+
+```
+.coupon-remark-wrapper {
+  padding: 20rpx;
+  padding-top: 33rpx;
+  padding-right: 60rpx;
+  margin-top: -20rpx;
+  line-height: 1;
+  box-sizing: border-box;
+  color: #666666;
+  background-color: #fff;
+  position: relative;
+  z-index: 1;
+}
+.coupon-remark-content {
+  width: 100%;
+  view {
+    font-size: 22rpx;
+    line-height: 1.5;
+    word-break: break-all;
+    display: inline-block;
+    max-width: 100%;
+  }
+  .ellipsis{
+    text-overflow:ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+  .toggle-icon {
+    width: 30rpx;
+    height: 30rpx;
+    position: absolute;
+    right: 20rpx;
+    top: 35rpx;
+    transition: all 0.2s linear;
+    &.show {
+      transform: rotate(180deg);
+    }
+  }
+}
+```
+
+```
+const couponItemBehavior = Behavior({
+	data: {
+		// 控制说明文案收起/展开
+		toggleParams: {
+			toggleFlag: 1, //0收起1展开
+			toggleShow: false, //默认不显示toggleIcon
+		},
+	},
+	ready() {
+		this._checkRemarkToggle();
+	},
+	methods: {
+		// 获取指定元素实际宽度
+		_getElementWidth(id = "") {
+			let _query = this.createSelectorQuery();
+			return new Promise(resolve => {
+				_query.select(id).fields({
+					size: true,
+				}, (res) => {
+					resolve(res.width)
+					_query = null;
+				}).exec();
+			});
+		},
+
+		// 说明文字收起/隐藏事件
+		toggleHandler() {
+			const {toggleFlag} = this.data.toggleParams;
+
+			this.setData({
+				toggleParams: {
+					toggleFlag: toggleFlag === 0 ? 1 : 0,
+					toggleShow: true
+				}
+			})
+		},
+		/*
+		* 检测说明文字是否需要隐藏/收起操作
+		* 对比文字外层固定宽度容器元素宽度wrapperWidth与当前文字元素宽度contentWidth
+		* 若相差小于10则说明超出一行
+		* */
+		_checkRemarkToggle() {
+			Promise.all([
+				this._getElementWidth('#toggle-wrapper'),
+				this._getElementWidth('#toggle-content')]
+			).then(res => {
+				const wrapperWidth = res[0];
+				const contentWidth = res[1];
+
+				const {limitRemark, startDate, endDate, statusCode} = this.properties.couponData;
+
+				if (wrapperWidth - contentWidth < 10) {
+					this.setData({
+						toggleParams: {
+							toggleFlag: 1,
+							toggleShow: true
+						},
+						timeArea: `${startDate}-${endDate}`,
+						unableImageSrc: UNABLE_IMAGE[statusCode]
+					})
+				}
+			})
+		}
+	}
+});
+```
+
+**总结：**  
+在这里只是个抛砖引玉提供一个思路，小程序中可以这样实现，在 H5 中也可以这样实现，如果有更好的方案，欢迎讨论提供！
+
+<h3 id="108">108. 微信小程序设置超出隐藏，点击加载更多实现动画效果</h3>
+
+#### 问题描述
+
+业务开发中经常会有一些场景，以商品订单场景为例，少于两个商品，不显示更多按钮，超过两个显示更多，点击展开，商品全部展示，并且有渐变动画效果
+
+#### 解决方案
+
+**Tips**：先说下自己当时的误区的纠正：  
+动画的发生需要满足以下条件：
+1. 实现动画的元素 css 属性写上了 transition 属性，并且值设置正确（具体值代表什么，自行百度）
+2. 元素需要实现动画的属性需要有具体的值的变化，如果不是具体的值则，不会实现动画（比如：max-height 的值由 100px => 200px 会有动画，但是由 100px => none/inherit 则不会有动画）
+
+实现效果如下图：
+
+![image](https://raw.githubusercontent.com/aYangLi/image-folder/master/youdao/animation-1.gif)
+
+**根据 Tips 的两点条件，遇到的瓶颈如下：**
+1. 产生动画的元素必须要有 css 属性值的具体变化；
+2. 商品的数量是不一定的，难以设置属性值的具体变化
+
+**解决上述两点，其实就是实现的思路：**
+1. css 属性值得具体变化，可以使用 max-height 属性来控制；
+2. 动态获取商品列表容器的高度，然后设置给 max-height 属性，这样，max-height 属性会由两个商品的高度和多个商品的高度来切换；
+
+**主要代码如下：**
+
+
+```
+<!--视图层：
+    ware-list 为最外层，由 max-height 控制动画，并且设置 overflow:hidden；
+    list-box 为包裹商品的盒子，max-height 的最大值为此盒子的高度，
+    list 为每一商品项
+    此处 278rpx 是商品为两个时的商品列表盒子的大概高度
+-->
+<view class="wares-lists" style="max-height:{{showAllWares?'100%':'278rpx'}};">
+    <view id="list-box">
+        <view class="list" wx:for="{{moduleData.wares}}" wx:key="index">
+            
+        </view>
+    </view>
+</view>
+```
+
+```
+<!-- 设置需要动画元素的样式 -->
+.wares-lists {
+	overflow: hidden;
+	transition: all 0.2s linear;
+}
+```
+
+**部分 js 代码如下：**
+```
+const app = getApp();
+Component({
+	/**
+	 * 组件的属性列表
+	 */
+	properties: {
+		moduleData: {
+			type: Object
+		},
+	},
+
+	/**
+	 * 组件的初始数据
+	 */
+	data: {
+		showAllWares: false,
+		listBoxHeight: '278rpx',
+	},
+	ready: function () {
+		this.setListHeight();
+	},
+	/**
+	 * 组件的方法列表
+	 */
+	methods: {
+		toggleShow: function (e) {
+			this.setData({
+				showAllWares: !this.data.showAllWares
+			});
+		},
+
+		// 设置商品列表高度
+		setListHeight () {
+			this._getElementHeight('#list-box').then( height => {
+				this.setData({
+					listBoxHeight:`${height}px`,
+				});
+			});
+		},
+
+		// 获取指定元素实际宽度
+		_getElementHeight(id = "") {
+			const _query = this.createSelectorQuery();
+			return new Promise(resolve => {
+				_query.select(id).fields({
+					size: true,
+				}, (res) => {
+					resolve(res.height);
+				}).exec();
+			});
+		},
+	}
+});
+
+```
+
+**总结：**  
+在这里只是个抛砖引玉提供一个思路，小程序中可以这样实现，在 H5 中也可以这样实现。
+
+
+<h3 id="107">107. vsCode 配置 easy sass 插件转换 css、wxss、acss</h3>
+
+#### 问题描述
+
+小程序开发有时会使用 easy sass 插件，在 vsCode 中配置自动转换，以下为配置方式：
+
+#### 解决方案
+
+先附上下图，再来一步步配置；
+
+![image](https://raw.githubusercontent.com/aYangLi/image-folder/master/youdao/vsCode-easy-sass.png)
+
+1. vsCode 中安装 easy sass 插件；
+2. 建一个文件夹.vscode
+.vscode 文件夹下建一个叫 settings.json 的文件（针对于当前项目的配置，全局的配置在全局的 settings.json 里添加） 
+settings.json 中配置内容如下：
+
+```
+"easysass.formats": [
+    {
+        "format": "expanded",  // 没有缩进的、扩展的css代码
+        "extension": ".wxss"  //转化的后缀名
+    },
+]
+```
+3. easysass.formats 是设置编译输出的 css 风格的，可以同时编译输出多个不同风格的 CSS 文件;
+
+> easysass.formats.format 支持四个选项用以编译生成对应风格的 CSS：  
+> - nested：嵌套缩进的 css 代码。  
+> - expanded：没有缩进的、扩展的css代码。  
+> - compact：简洁格式的 css 代码。  
+> - compressed：压缩后的 css 代码。  
+
+> easysass.formats.extension 顾名思义就是设置编译输出的文件名了
+
+<h3 id="106">106. vsCode 配置 easy less插件转换 css、wxss、acss</h3>
+
+#### 问题描述
+
+小程序开发有时会使用 easy less 插件，在 vsCode 中配置自动转换，以下为配置方式：
+
+#### 解决方案
+
+先附上下图，再来一步步配置；
+
+![image](https://raw.githubusercontent.com/aYangLi/image-folder/master/youdao/vsCode-easy-less.png)
+
+1. vsCode 中安装 easy less 插件；
+2. 建一个文件夹.vscode
+.vscode 文件夹下建一个叫 settings.json 的文件 
+settings.json 中配置内容如下：
+
+```
+"less.compile": {
+  "outExt": ".wxss"
+}
+```
+3. outExt 参数为导出文件名，默认为 .css，可以配置 .wxss、.acss 等，其他配置项请查询官方；
 
 <h3 id="105">105. 微信小程序中 input 的自定义删除按钮点不了</h3>
 
