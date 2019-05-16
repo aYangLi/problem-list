@@ -1,4 +1,5 @@
 ### 目录
+[111. nginx 配置 https 报错问题](#111)  
 [110. vsCode git 操作提示 Permission denied, please try again](#110)  
 [109. 微信小程序设置超出行显示 ... 与展开更多按钮](#109)  
 [108. 微信小程序设置超出隐藏，点击加载更多实现动画效果](#108)  
@@ -110,6 +111,29 @@
 [2. jQuery 中 trigger 的使用](#2)  
 [1. stick footer 黏性底部](#1)
 
+<h3 id="111">111. nginx 配置 https 报错问题</h3>
+
+#### 问题描述
+
+用 nginx 配置 https 时，需要配置 443 端口、私钥路径、证书路径。会报错如下：  
+
+``` shell
+root@VM-173-231-ubuntu:~# nginx -t
+nginx: [emerg] BIO_new_file("/usr/local/nginx/conf/1_yculcy.cn_bundle.crt") failed (SSL: error:02001002:system library:fopen:No such file or directory:fopen('/usr/local/nginx/conf/1_yculcy.cn_bundle.crt','r') error:2006D080:BIO routines:BIO_new_file:no such file)
+nginx: configuration file /etc/nginx/nginx.conf test failed
+```
+如下图：
+![nginx 配置报错信息](https://raw.githubusercontent.com/aYangLi/image-folder/master/youdao/nginx-conf-error.png)
+报错提示配置文件有错误，找不多私钥和证书。
+
+#### 解决方案
+
+最终发现，无论windows还是linux，只要写绝对路径，就会报错。  
+
+**所以：**  
+在 windows 下，将证书文件等放到 nginx/conf/ 目录下，配置文件中，不用加路径；  
+在 linux 下，可以将证书文件等放到 nginx.conf 同级目录下，不加路径即可，或者也可以放到 nginx/conf/ 目录下，可以加相对路径。
+
 <h3 id="110">110. vsCode git 操作提示 Permission denied, please try again</h3>
 
 #### 问题描述
@@ -121,7 +145,7 @@
 如果正确配置了 ssh key，则已经有了权限，但是每次提示 Permission denied, please try again 是因为需要 root 密码获取 ~/.ssh/id_rsa.pub 的 key；所以，在终端里执行以下命令：
 
 
-```
+``` shell
 ssh-add ~/.ssh/id_rsa
 ```
 
@@ -317,7 +341,7 @@ const couponItemBehavior = Behavior({
     list 为每一商品项
     此处 278rpx 是商品为两个时的商品列表盒子的大概高度
 -->
-<view class="wares-lists" style="max-height:{{showAllWares?'100%':'278rpx'}};">
+<view class="wares-lists" style="max-height:{{showAllWares?listBoxHeight:'278rpx'}};">
     <view id="list-box">
         <view class="list" wx:for="{{moduleData.wares}}" wx:key="index">
             
