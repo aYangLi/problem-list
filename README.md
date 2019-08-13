@@ -1,4 +1,10 @@
 ### 目录
+[117. rem单位border-radius:50%在安卓手机中画圆变形](#117)  
+[116. 手机安装Charles的https证书](#116)  
+[115. mac webstorm 配置 dart 插件](#115)  
+[114. vsCode 安装 dart 插件](#114)  
+[113. nginx 配置 http 强转 https](#113)  
+[112. 记录一些 nginx 常用的全局变量](#112)  
 [111. nginx 配置 https 报错问题](#111)  
 [110. vsCode git 操作提示 Permission denied, please try again](#110)  
 [109. 微信小程序设置超出行显示 ... 与展开更多按钮](#109)  
@@ -111,6 +117,201 @@
 [2. jQuery 中 trigger 的使用](#2)  
 [1. stick footer 黏性底部](#1)
 
+<h3 id="117">117.  rem单位border-radius:50%在安卓手机中画圆变形</h3>
+
+#### 问题描述
+
+使用border-radius:50%,或者border-radius的值与宽高相等，都可实现一个完美的圆形，但是在不同的安卓手机中，会有不同程度的变形（有的扁圆，有的大，有的小）；当使用px做为宽高的单位，border-radius:50%画出来的圆是不会变形的；但使用rem时，rem在换算为px时，会是一个带小数点的值，安卓对小于1px的做了处理（不同浏览器对小于1px的处理方式不同，有的采用四舍五入，有的大于某个值展示1px否则就舍去），从而导致圆角不圆；在ios下就没有这个问题。
+
+#### 解决方案
+- 很多文章指出直接用px, 但是这样做无法达到适配的目的
+- 还有的说设置一个很大的值：border-radius:9999px,亲测不行（如：华为）
+- 使用svg, 既可以适配，即使再小的圆形也能在不同屏幕上完美展示，但又很麻烦
+
+**最终方案**
+
+```
+  i{
+       display: inline-block
+       width: .16rem
+       height: .16rem
+       background-color: red
+       border-radius: 50%
+       transform: scale(.5)
+   }
+```
+先把width，height的值放大一倍，然后用transform scale(.5)缩小一倍，接着用transform-origin调整下圆的位置就大功告成了！
+
+<h3 id="116">116. 手机安装Charles的https证书</h3>
+
+#### 详情描述
+
+一、iOS客户端安装证书  
+1. 打开Charles，选择help→SSL Proxying→Install Charles Root Certificate on a Mobile Device or Remote Browser
+2. 手机连接电脑代理，打开safari，输入网址：chls.pro/ssl
+3. 手机弹出提示：此网站正尝试打开“设置”已向您显示一个配置描述文件。您要允许吗？忽略|允许，选择允许，安装描述文件，并信任
+4. iOS10.3以上的手机需要在：设置→ 通用 → 关于本机 → 证书信任设置→ 找到charles proxy CA证书，打开信任即可   
+
+二、android（安卓）客户端安装证书安卓手机类型众多，所以有些不太一样。 
+
+**方法一：**
+1. 打开Charles，选择help→SSL Proxying→Install Charles Root Certificate on a Mobile Device or Remote Browser
+2. 手机连接电脑代理，打开浏览器，输入网址：chls.pro/ssl
+3. 手机弹出提示：安装配置描述文件。您要允许吗？忽略|允许，选择允许，即可  
+
+**方法二：**  
+1. 打开Charles，选择help→SSL Proxying→Save Charles Certificate，将证书导入到手机中
+2. 导入后直接点击安装证书即可  
+
+**方法三：**
+1. 打开Charles，选择help→SSL Proxying→Save Charles Certificate，将证书导入到手机中
+2. 导入后直接点击安装证书，提示无法打开
+3. 进入手机设置 → 更多设置 → 系统安全 → 从存储设备安装 → 选择charles.pem，点击高级，安装证书即可
+
+
+<h3 id="115">115. mac webstorm 配置 dart 插件</h3>
+
+#### 详情描述
+
+1. 安装 dart ,移驾官网 [dart 下载](http://dart.goodev.org/install/mac)
+2. webstorm 中 在 plugins 中下载 Dart 插件，如下图：
+![webstorm 下载 dart 插件](https://raw.githubusercontent.com/aYangLi/image-folder/master/youdao/webstorm-plugin-dart.png)
+3. 配置 sdk 路径：在设置中 => 语言&框架 => dart 配置 Dart SDK path：  
+![dart-sdk-path](https://raw.githubusercontent.com/aYangLi/image-folder/master/youdao/webstorm-dart-path.png)  
+*/usr/local/opt/dart/libexec* 是我本地默认安装的 dart sdk 路径，查看自己本机的 dart 信息如下
+
+```
+$ brew info dart
+dart-lang/dart/dart: stable 2.4.0, devel 2.5.0-dev.1.0
+The Dart SDK
+https://www.dartlang.org/
+/usr/local/Cellar/dart/2.4.0 (387 files, 344.4MB) *
+  Built from source on 2019-07-30 at 19:40:43
+From: https://github.com/dart-lang/homebrew-dart/blob/master/dart.rb
+==> Options
+--devel
+        Install development version 2.5.0-dev.1.0
+==> Caveats
+Please note the path to the Dart SDK:
+  /usr/local/opt/dart/libexec
+
+```
+> 或者让 webstorm 自动配置：file => new => project... => dart； 这样，创建一个 dart 项目，然后创建的 dart 项目会自动配置 dart SDK path （前提是安装了 dart）
+
+4. 快速运行 dart 文件，查看输出信息（前提是配置了 dart sdk path）：
+![dart-run](https://raw.githubusercontent.com/aYangLi/image-folder/master/youdao/webstorm-dart-run.png)
+
+<h3 id="114">114. vsCode 安装 dart 插件</h3>
+
+#### 详情描述
+
+用 vsCode 开发 dart，安装两个插件会更方便，如下：  
+
+![vsCode dart 插件](https://raw.githubusercontent.com/aYangLi/image-folder/master/youdao/dart-plugin.png)
+
+- Dart 插件是用来语法提示！  
+- Code Runner 是方便来运行 dart 文件（前提是必须安装 dart 环境，如何安装，请移驾官网），使用方法：在 vsCode 中右击文件，选择 Run code，输出里面就会显示文件输出信息
+
+
+<h3 id="113">113. nginx 配置 http 强转 https</h3>
+
+#### 问题描述
+
+如今 https 比 http 更加安全，可以用 nginx 配置一下 http 请求强转 https；
+
+#### 解决方案
+
+##### 方法一：采用nginx的497状态码
+
+``` JavaScript
+server {
+	listen 8080 default_server;
+	listen [::]:8080 default_server;
+
+	# SSL configuration
+	#
+	listen 443 ssl default_server;
+	listen [::]:443 ssl default_server;
+	server_name yculcy.cn; #填写绑定证书的域名
+	ssl on;
+	ssl_certificate ./conf/1_yculcy.cn_bundle.crt;
+	ssl_certificate_key ./conf/2_yculcy.cn.key;
+	ssl_session_timeout 5m;
+	ssl_protocols TLSv1 TLSv1.1 TLSv1.2; #按照这个协议配置
+	ssl_ciphers ECDHE-RSA-AES128-GCM-SHA256:HIGH:!aNULL:!MD5:!RC4:!DHE;#按照这个套件配置
+	ssl_prefer_server_ciphers on;
+	# 根据状态码 497 当网站只允许https访问时，当用http访问时nginx会报出497错误码
+	error_page 497  https://$host$request_uri;
+
+	root /var/www/html;
+
+	# Add index.php to the list if you are using PHP
+	index index.html index.htm index.nginx-debian.html;
+
+	server_name _;
+
+	location / {
+		# First attempt to serve request as file, then
+		# as directory, then fall back to displaying a 404.
+		try_files $uri $uri/ =404;
+	}
+}
+
+```
+##### 方法二：用 rewrite 重定向
+
+
+``` JavaScript
+server {
+	listen 8080 default_server;
+	listen [::]:8080 default_server;
+	rewrite ^(.*)$  https://$host$1 permanent;        # 这是ngixn早前的写法，现在还可以使用。
+}
+```
+
+<h3 id='112'>112. 记录一些 nginx 常用的全局变量</h3>
+
+#### 详情描述
+
+nginx 的全局变量容易忘记，以下记录一下备用：
+
+``` JavaScript
+$remote_addr		    // 获取客户端ip
+$binary_remote_addr	    // 客户端ip（二进制)
+$remote_port		    // 客户端port，如：50472
+$remote_user		    // 已经经过Auth Basic Module验证的用户名
+$host			        // 请求主机头字段，否则为服务器名称，如:blog.sakmon.com
+$request		        // 用户请求信息，如：GET ?a=1&b=2 HTTP/1.1
+$request_filename   	// 当前请求的文件的路径名，由root或alias和URI request组合而成，如：/2013/81.html
+$status			        // 请求的响应状态码,如:200
+$body_bytes_sent        // 响应时送出的body字节数数量。即使连接中断，这个数据也是精确的,如：40
+$content_length	        // 等于请求行的“Content_Length”的值
+$content_type	        // 等于请求行的“Content_Type”的值
+$http_referer	        // 引用地址
+$http_user_agent        // 客户端agent信息,如：Mozilla/5.0 (Windows NT 5.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/29.0.1547.76 Safari/537.36
+$args		            // 与$query_string相同 等于当中URL的参数(GET)，如a=1&b=2
+$document_uri	        // 与$uri相同  这个变量指当前的请求URI，不包括任何参数(见$args) 如:/2013/81.html
+$document_root	        // 针对当前请求的根路径设置值
+$hostname	            // 如：centos53.localdomain
+$http_cookie	        // 客户端cookie信息
+$cookie_COOKIE	        // cookie COOKIE变量的值
+$is_args	            // 如果有$args参数，这个变量等于”?”，否则等于”"，空值，如?
+$limit_rate	            // 这个变量可以限制连接速率，0表示不限速
+$query_string	        // 与$args相同 等于当中URL的参数(GET)，如a=1&b=2
+$request_body	        // 记录POST过来的数据信息
+$request_body_file	    // 客户端请求主体信息的临时文件名
+$request_method	        // 客户端请求的动作，通常为GET或POST,如：GET
+$request_uri	        // 包含请求参数的原始URI，不包含主机名，如：/2013/81.html?a=1&b=2
+$scheme		            // HTTP方法（如http，https）,如：http
+$uri			        // 这个变量指当前的请求URI，不包括任何参数(见$args) 如:/2013/81.html
+$request_completion	    // 如果请求结束，设置为OK. 当请求未结束或如果该请求不是请求链串的最后一个时，为空(Empty)，如：OK
+$server_protocol	    // 请求使用的协议，通常是HTTP/1.0或HTTP/1.1，如：HTTP/1.1
+$server_addr		    // 服务器IP地址，在完成一次系统调用后可以确定这个值
+$server_name		    // 服务器名称，如：blog.sakmon.com
+$server_port		    // 请求到达服务器的端口号,如：80
+```
+
+
 <h3 id="111">111. nginx 配置 https 报错问题</h3>
 
 #### 问题描述
@@ -122,8 +323,8 @@ root@VM-173-231-ubuntu:~# nginx -t
 nginx: [emerg] BIO_new_file("/usr/local/nginx/conf/1_yculcy.cn_bundle.crt") failed (SSL: error:02001002:system library:fopen:No such file or directory:fopen('/usr/local/nginx/conf/1_yculcy.cn_bundle.crt','r') error:2006D080:BIO routines:BIO_new_file:no such file)
 nginx: configuration file /etc/nginx/nginx.conf test failed
 ```
-如下图：
-![nginx 配置报错信息](https://raw.githubusercontent.com/aYangLi/image-folder/master/youdao/nginx-conf-error.png)
+如下图：  
+![nginx 配置报错信息](https://raw.githubusercontent.com/aYangLi/image-folder/master/youdao/nginx-conf-error.png)  
 报错提示配置文件有错误，找不多私钥和证书。
 
 #### 解决方案
